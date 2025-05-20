@@ -1,9 +1,17 @@
 package main
 
-import fiber "quizit-be/pkg/fiber"
+import (
+	"quizit-be/pkg/env"
+	fiber "quizit-be/pkg/fiber"
+)
 
 func main() {
+	env, err := env.Load()
+	if err != nil {
+		panic(err)
+	}
+
 	app := fiber.Start()
 
-	app.Listen("127.0.0.1:8080")
+	app.Listen("127.0.0.1:" + env.AppPort)
 }
