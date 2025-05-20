@@ -13,5 +13,5 @@ func main() {
 
 	app := fiber.Start()
 
-	app.Listen("127.0.0.1:" + env.AppPort)
+	app.Listen("127.0.0.1:" + env.APP_PORT)
 }
