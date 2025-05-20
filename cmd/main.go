@@ -2,7 +2,8 @@ package main
 
 import (
 	"quizit-be/pkg/env"
-	fiber "quizit-be/pkg/fiber"
+	"quizit-be/pkg/fiber"
+	"quizit-be/pkg/postgres"
 )
 
 func main() {
@@ -12,6 +13,10 @@ func main() {
 	}
 
 	app := fiber.Start()
+	_, err = postgres.Connect(*env)
+	if err != nil {
+		panic(err)
+	}
 
 	app.Listen("127.0.0.1:" + env.APP_PORT)
 }
