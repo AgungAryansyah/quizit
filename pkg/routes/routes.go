@@ -18,11 +18,12 @@ func NewRoute(app *fiber.App, handler rest.Handler) *Route {
 	}
 }
 
-func (r *Route) RegisterRoutes() {
+func (r *Route) RegisterRoutes(port string) error {
 	routerGroup := r.app.Group("/api/v1")
 
 	mountAuth(routerGroup, r.handler)
 
+	return r.app.Listen(":" + port)
 }
 
 func mountAuth(routerGroup fiber.Router, handler rest.Handler) {

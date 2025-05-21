@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"quizit-be/internal/handler/rest"
 	"quizit-be/internal/repository"
 	"quizit-be/internal/service"
@@ -37,7 +38,8 @@ func main() {
 	handler := rest.NewHandler(service, middleware)
 
 	route := routes.NewRoute(app, *handler)
-	route.RegisterRoutes()
-
-	app.Listen("127.0.0.1:" + env.APP_PORT)
+	fmt.Println(env.APP_PORT)
+	if err := route.RegisterRoutes(env.APP_PORT); err != nil {
+		panic(err)
+	}
 }
