@@ -12,5 +12,5 @@ create:
 up:
 	@GOOSE_DRIVER=postgres GOOSE_DBSTRING=$(DB_URL) goose -dir=db/migrations up
 
-up:
+down:
 	@GOOSE_DRIVER=postgres GOOSE_DBSTRING=$(DB_URL) goose -dir=db/migrations down
