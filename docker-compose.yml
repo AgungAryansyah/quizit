@@ -1,0 +1,39 @@
+services:
+  quizit-postgres:
+    container_name: "quizit-postgres"
+    image: postgres:13-alpine
+    ports:
+      - "${DB_PORT}:5432"
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    networks:
+      - quizit-network
+
+  quizit-be:
+    container_name: "quizit-be"
+    build:
+      context: .
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    networks:
+      - quizit-network
+    depends_on:
+      - quizit-postgres
+    restart: on-failure
+    
+networks:
+  quizit-network:
+    name: quizit-network
+    driver: bridge

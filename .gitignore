@@ -26,3 +26,6 @@ go.work.sum
 
 # ide specific config
 .vscode/*
+
+#postgres
+/postgres_data

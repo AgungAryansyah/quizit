@@ -19,6 +19,7 @@ func main() {
 	}
 
 	app := fiber.Start()
+
 	_, err = postgres.Connect(*env)
 	if err != nil {
 		panic(err)
