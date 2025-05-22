@@ -31,4 +31,5 @@ func mountAuth(routerGroup fiber.Router, handler rest.Handler) {
 
 	auth.Post("/register", handler.Register)
 	auth.Post("/login", handler.Login)
+	auth.Post("/refresh", handler.RefreshTokenn)
 }

@@ -3,12 +3,14 @@ package repository
 import (
 	"quizit-be/model/entity"
 
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
 type IUserRepository interface {
 	CreateUser(user *entity.User) error
 	GetUserByEmail(email string) (user *entity.User, err error)
+	GetUser(userId uuid.UUID) (user *entity.User, err error)
 }
 
 type UserRepository struct {
@@ -30,6 +32,17 @@ func (r *UserRepository) CreateUser(user *entity.User) error {
 	}
 
 	return nil
+}
+
+func (r *UserRepository) GetUser(userId uuid.UUID) (user *entity.User, err error) {
+	user = &entity.User{}
+	query := `SELECT * FROM users WHERE id = $1`
+	err = r.db.Get(user, query, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (r *UserRepository) GetUserByEmail(email string) (user *entity.User, err error) {

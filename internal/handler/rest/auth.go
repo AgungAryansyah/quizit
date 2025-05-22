@@ -66,4 +66,41 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 	})
 }
 
-//todo: add error handler and validator
+func (h *Handler) RefreshTokenn(ctx *fiber.Ctx) error {
+	expiry, err := strconv.Atoi(h.env.JWT_EXPIRED)
+	if err != nil {
+		return err
+	}
+
+	res, err := h.service.AuthService.ReplaceToken(ctx.Cookies("refresh_token"), expiry)
+	if err != nil {
+		return err
+	}
+
+	ctx.Cookie(&fiber.Cookie{
+		Name:     "token",
+		Value:    res.Token,
+		Expires:  time.Now().Add(time.Duration(expiry) * time.Second),
+		HTTPOnly: true,
+		Secure:   false,
+		Path:     "/",
+		SameSite: "None",
+	})
+
+	ctx.Cookie(&fiber.Cookie{
+		Name:     "refresh_token",
+		Value:    res.RefreshToken,
+		Expires:  time.Now().Add(time.Duration(expiry) * time.Second),
+		HTTPOnly: true,
+		Secure:   false,
+		Path:     "/",
+		SameSite: "None",
+	})
+
+	return ctx.JSON(fiber.Map{
+		"message": "success",
+		"payload": nil,
+	})
+}
+
+//todo: add global handler and validator

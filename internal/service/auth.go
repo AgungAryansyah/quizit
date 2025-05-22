@@ -16,6 +16,7 @@ import (
 type IAuthService interface {
 	Register(register *dto.Register) error
 	Login(login *dto.LoginReq, expiry int) (res *dto.LoginRes, err error)
+	ReplaceToken(token string, expiry int) (res *dto.LoginRes, err error)
 }
 
 type AuthService struct {
@@ -83,6 +84,38 @@ func (s *AuthService) Login(login *dto.LoginReq, expiry int) (res *dto.LoginRes,
 	_ = s.AuthRepository.DeleteSession(user.Id)
 
 	if err := s.AuthRepository.StoreSession(session); err != nil {
+		return nil, err
+	}
+
+	return &dto.LoginRes{
+		Token:        token,
+		RefreshToken: refreshToken,
+	}, nil
+}
+
+func (s *AuthService) ReplaceToken(token string, expiry int) (res *dto.LoginRes, err error) {
+	session, err := s.AuthRepository.GetSessionByToken(token)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := s.UserRepository.GetUser(session.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	token, err = s.jwt.GenerateToken(user.Id, user.RoleId)
+	if err != nil {
+		return nil, err
+	}
+
+	refreshToken, err := generateRefreshToken(64)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.AuthRepository.ReplaceToken(user.Id, refreshToken, time.Now().Add(time.Duration(expiry)*time.Second))
+	if err != nil {
 		return nil, err
 	}
 
