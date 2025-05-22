@@ -11,9 +11,9 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type JWTItf interface {
-	GenerateToken(id uuid.UUID, isAdmin bool) (string, error)
-	ValidateToken(token string) (uuid.UUID, bool, error)
+type IJWT interface {
+	GenerateToken(id uuid.UUID, roleId int) (string, error)
+	ValidateToken(token string) (uuid.UUID, int, error)
 }
 
 type JWT struct {
@@ -21,7 +21,7 @@ type JWT struct {
 	expiresAt time.Time
 }
 
-func NewJwt(env env.Env) JWTItf {
+func NewJwt(env env.Env) IJWT {
 	err := godotenv.Load()
 	if err != nil {
 		return nil
@@ -38,15 +38,15 @@ func NewJwt(env env.Env) JWTItf {
 }
 
 type Claims struct {
-	Id      uuid.UUID
-	IsAdmin bool
+	Id   uuid.UUID
+	Role int
 	jwt.RegisteredClaims
 }
 
-func (j *JWT) GenerateToken(id uuid.UUID, isAdmin bool) (string, error) {
+func (j *JWT) GenerateToken(id uuid.UUID, roleId int) (string, error) {
 	claim := Claims{
-		Id:      id,
-		IsAdmin: isAdmin,
+		Id:   id,
+		Role: roleId,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(j.expiresAt),
 		},
@@ -60,7 +60,7 @@ func (j *JWT) GenerateToken(id uuid.UUID, isAdmin bool) (string, error) {
 	return tokenString, nil
 }
 
-func (j *JWT) ValidateToken(tokenString string) (uuid.UUID, bool, error) {
+func (j *JWT) ValidateToken(tokenString string) (uuid.UUID, int, error) {
 	var claim Claims
 
 	token, err := jwt.ParseWithClaims(tokenString, &claim, func(t *jwt.Token) (interface{}, error) {
@@ -68,12 +68,12 @@ func (j *JWT) ValidateToken(tokenString string) (uuid.UUID, bool, error) {
 	})
 
 	if err != nil {
-		return uuid.Nil, false, err
+		return uuid.Nil, 0, err
 	}
 
 	if !token.Valid {
-		return uuid.Nil, false, errors.New("token invalid")
+		return uuid.Nil, 0, errors.New("token invalid")
 	}
 
-	return claim.Id, claim.IsAdmin, nil
+	return claim.Id, claim.Role, nil
 }

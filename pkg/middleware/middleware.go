@@ -12,10 +12,10 @@ type IMiddleware interface {
 }
 
 type Middleware struct {
-	jwt jwt.JWTItf
+	jwt jwt.IJWT
 }
 
-func NewMiddleware(jwt jwt.JWTItf) IMiddleware {
+func NewMiddleware(jwt jwt.IJWT) IMiddleware {
 	return &Middleware{
 		jwt: jwt,
 	}

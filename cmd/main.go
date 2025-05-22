@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"quizit-be/internal/handler/rest"
 	"quizit-be/internal/repository"
 	"quizit-be/internal/service"
@@ -34,11 +33,10 @@ func main() {
 	middleware := middleware.NewMiddleware(jwt)
 
 	repository := repository.NewRepository(db)
-	service := service.NewService(repository)
-	handler := rest.NewHandler(service, middleware)
+	service := service.NewService(repository, &jwt)
+	handler := rest.NewHandler(service, middleware, env)
 
 	route := routes.NewRoute(app, *handler)
-	fmt.Println(env.APP_PORT)
 	if err := route.RegisterRoutes(env.APP_PORT); err != nil {
 		panic(err)
 	}

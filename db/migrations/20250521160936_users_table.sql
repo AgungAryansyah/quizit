@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS sessions (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS roles;
-DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS sessions;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS roles;
 -- +goose StatementEnd

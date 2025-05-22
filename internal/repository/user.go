@@ -8,6 +8,7 @@ import (
 
 type IUserRepository interface {
 	CreateUser(user *entity.User) error
+	GetUserByEmail(email string) (user *entity.User, err error)
 }
 
 type UserRepository struct {
@@ -21,12 +22,23 @@ func NewUserRepository(db *sqlx.DB) IUserRepository {
 }
 
 func (r *UserRepository) CreateUser(user *entity.User) error {
-	query := `INSERT INTO users (id, name, email, password) VALUES ($1, $2, $3, $4)`
-	_, err := r.db.Exec(query, user.Id, user.Name, user.Email, user.Password)
+	query := `INSERT INTO users (id, name, profile_picture, email, password) VALUES ($1, $2, $3, $4, $5)`
+	_, err := r.db.Exec(query, user.Id, user.Name, "", user.Email, user.Password)
 
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (r *UserRepository) GetUserByEmail(email string) (user *entity.User, err error) {
+	user = &entity.User{}
+	query := `SELECT * FROM users WHERE email = $1`
+	err = r.db.Get(user, query, email)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
