@@ -51,7 +51,13 @@ var (
 	Forbidden        = CustomErrorResponse(http.StatusForbidden, "Forbidden access")
 	DuplicateAccount = CustomErrorResponse(http.StatusConflict, "User already exists")
 
-	UserNotFound = CustomErrorResponse(http.StatusNotFound, "User not found")
+	BadRequest = CustomErrorResponse(http.StatusBadRequest, "Bad request")
+
+	UserNotFound     = CustomErrorResponse(http.StatusNotFound, "User not found")
+	QuizNotFound     = CustomErrorResponse(http.StatusNotFound, "Quiz not found")
+	QuestionNotFound = CustomErrorResponse(http.StatusNotFound, "Question not found")
+	OptionNotFound   = CustomErrorResponse(http.StatusNotFound, "Option not found")
+	AttemptNotFound  = CustomErrorResponse(http.StatusNotFound, "Attempt not found")
 
 	InvalidToken       = CustomErrorResponse(http.StatusUnauthorized, "Token invalid")
 	ExpiredToken       = CustomErrorResponse(http.StatusUnauthorized, "Expired token")

@@ -37,7 +37,7 @@ func main() {
 	service := service.NewService(repository, &jwt)
 	handler := rest.NewHandler(service, middleware, env)
 
-	route := routes.NewRoute(app, *handler)
+	route := routes.NewRoute(app, *handler, middleware)
 	if err := route.RegisterRoutes(env.APP_PORT); err != nil {
 		panic(err)
 	}
