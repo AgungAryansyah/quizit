@@ -1,10 +1,14 @@
 package repository
 
 import (
+	"database/sql"
+	"errors"
 	"quizit-be/model/entity"
+	"quizit-be/pkg/response"
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type IUserRepository interface {
@@ -27,31 +31,32 @@ func (r *UserRepository) CreateUser(user *entity.User) error {
 	query := `INSERT INTO users (id, name, profile_picture, email, password) VALUES ($1, $2, $3, $4, $5)`
 	_, err := r.db.Exec(query, user.Id, user.Name, "", user.Email, user.Password)
 
-	if err != nil {
-		return err
+	var pgErr *pq.Error
+	if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+		return &response.DuplicateAccount
 	}
 
-	return nil
+	return err
 }
 
 func (r *UserRepository) GetUser(userId uuid.UUID) (user *entity.User, err error) {
 	user = &entity.User{}
 	query := `SELECT * FROM users WHERE id = $1`
 	err = r.db.Get(user, query, userId)
-	if err != nil {
-		return nil, err
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, &response.UserNotFound
 	}
 
-	return user, nil
+	return user, err
 }
 
 func (r *UserRepository) GetUserByEmail(email string) (user *entity.User, err error) {
 	user = &entity.User{}
 	query := `SELECT * FROM users WHERE email = $1`
 	err = r.db.Get(user, query, email)
-	if err != nil {
-		return nil, err
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, &response.UserNotFound
 	}
 
-	return user, nil
+	return user, err
 }

@@ -47,8 +47,13 @@ func (e *ErrorResponse) Error() string {
 var (
 	InternalServerError = CustomErrorResponse(http.StatusInternalServerError, "Internal server error")
 
-	Unauthorized = CustomErrorResponse(http.StatusUnauthorized, "Unauthorized access")
-	Forbidden    = CustomErrorResponse(http.StatusForbidden, "Forbidden access")
+	Unauthorized     = CustomErrorResponse(http.StatusUnauthorized, "Unauthorized access")
+	Forbidden        = CustomErrorResponse(http.StatusForbidden, "Forbidden access")
+	DuplicateAccount = CustomErrorResponse(http.StatusConflict, "User already exists")
 
 	UserNotFound = CustomErrorResponse(http.StatusNotFound, "User not found")
+
+	InvalidToken       = CustomErrorResponse(http.StatusUnauthorized, "Token invalid")
+	ExpiredToken       = CustomErrorResponse(http.StatusUnauthorized, "Expired token")
+	InvalidCredentials = CustomErrorResponse(http.StatusUnauthorized, "Invalid credentials")
 )

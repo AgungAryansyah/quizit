@@ -3,6 +3,7 @@ package jwt
 import (
 	"errors"
 	"quizit-be/pkg/env"
+	"quizit-be/pkg/response"
 	"strconv"
 	"time"
 
@@ -68,11 +69,14 @@ func (j *JWT) ValidateToken(tokenString string) (uuid.UUID, int, error) {
 	})
 
 	if err != nil {
+		if errors.Is(err, jwt.ErrTokenExpired) {
+			return uuid.Nil, 0, &response.ExpiredToken
+		}
 		return uuid.Nil, 0, err
 	}
 
 	if !token.Valid {
-		return uuid.Nil, 0, errors.New("token invalid")
+		return uuid.Nil, 0, &response.InvalidToken
 	}
 
 	return claim.Id, claim.Role, nil

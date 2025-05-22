@@ -1,7 +1,10 @@
 package repository
 
 import (
+	"database/sql"
+	"errors"
 	"quizit-be/model/entity"
+	"quizit-be/pkg/response"
 	"time"
 
 	"github.com/google/uuid"
@@ -50,11 +53,11 @@ func (r *AuthRepository) GetSessionByToken(token string) (session *entity.Sessio
 
 	query := `SELECT * FROM sessions WHERE token = $1`
 	err = r.db.Get(session, query, token)
-	if err != nil {
-		return nil, err
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, &response.InvalidToken
 	}
 
-	return session, nil
+	return session, err
 }
 
 func (r *AuthRepository) ReplaceToken(userId uuid.UUID, token string, expiry time.Time) error {

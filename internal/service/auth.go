@@ -7,6 +7,7 @@ import (
 	"quizit-be/model/dto"
 	"quizit-be/model/entity"
 	"quizit-be/pkg/jwt"
+	"quizit-be/pkg/response"
 	"time"
 
 	"github.com/google/uuid"
@@ -62,7 +63,7 @@ func (s *AuthService) Login(login *dto.LoginReq, expiry int) (res *dto.LoginRes,
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(login.Password))
 	if err != nil {
-		return nil, err
+		return nil, &response.InvalidCredentials
 	}
 
 	token, err := s.jwt.GenerateToken(user.Id, user.RoleId)
