@@ -80,6 +80,8 @@ func (s *AuthService) Login(login *dto.LoginReq, expiry int) (res *dto.LoginRes,
 		ExpiresAt: time.Now().Add(time.Duration(expiry) * time.Second),
 	}
 
+	_ = s.AuthRepository.DeleteSession(user.Id)
+
 	if err := s.AuthRepository.StoreSession(session); err != nil {
 		return nil, err
 	}
