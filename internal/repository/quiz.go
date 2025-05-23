@@ -78,7 +78,7 @@ func (r *QuizRepository) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *e
 	var options []entity.Option
 	query = `
         SELECT id, question_id, is_correct, text, image
-        FROM options WHERE id IN (
+        FROM options WHERE question_id IN (
             SELECT id FROM questions WHERE quiz_id = $1
         )
     `
@@ -121,9 +121,9 @@ func (r *QuizRepository) GetQuiz(quizParam dto.QuizParam) (quiz *entity.Quiz, er
 func (r *QuizRepository) CreteAttempt(attempt *entity.Attempt) error {
 	query := `
 		INSERT INTO attempts (id, user_id, quiz_id, total_score, finished_time)
-		VALUES (:id, :user_id, :quiz_id, :total_score, :finished_time)
+		VALUES ($1, $2, $3, $4, $5)
 	`
-	_, err := r.db.Exec(query, attempt)
+	_, err := r.db.Exec(query, attempt.Id, attempt.UserId, attempt.QuizId, attempt.TotalScore, attempt.FinishedTime)
 	return err
 }
 

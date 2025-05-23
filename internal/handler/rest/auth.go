@@ -66,7 +66,7 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 	})
 }
 
-func (h *Handler) RefreshTokenn(ctx *fiber.Ctx) error {
+func (h *Handler) RefreshToken(ctx *fiber.Ctx) error {
 	expiry, err := strconv.Atoi(h.env.JWT_EXPIRED)
 	if err != nil {
 		return err

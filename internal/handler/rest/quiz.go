@@ -5,6 +5,7 @@ import (
 	"quizit-be/pkg/response"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 func (h *Handler) GetAllQuizzes(ctx *fiber.Ctx) error {
@@ -20,12 +21,12 @@ func (h *Handler) GetAllQuizzes(ctx *fiber.Ctx) error {
 }
 
 func (h *Handler) GetQuizWithQuestionAndOption(ctx *fiber.Ctx) error {
-	var param dto.QuizParam
-	if err := ctx.BodyParser(&param); err != nil {
+	quizId, err := uuid.Parse(ctx.Params("id"))
+	if err != nil {
 		return &response.BadRequest
 	}
 
-	quiz, err := h.service.QuizService.GetQuizWithQuestionAndOption(param)
+	quiz, err := h.service.QuizService.GetQuizWithQuestionAndOption(quizId)
 	if err != nil {
 		return err
 	}
@@ -39,10 +40,10 @@ func (h *Handler) CreateAttempt(ctx *fiber.Ctx) error {
 		return &response.BadRequest
 	}
 
-	err := h.service.QuizService.CreateAttempt(answers)
+	attempt, err := h.service.QuizService.CreateAttempt(answers)
 	if err != nil {
 		return err
 	}
 
-	return response.HttpSuccess(ctx, "success", nil)
+	return response.HttpSuccess(ctx, "success", attempt)
 }

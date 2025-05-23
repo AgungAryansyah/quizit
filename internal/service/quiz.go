@@ -11,8 +11,8 @@ import (
 
 type IQuizService interface {
 	GetAllQuizzes(page, pageSize int) (quiz *[]entity.Quiz, err error)
-	GetQuizWithQuestionAndOption(quizParam dto.QuizParam) (quiz *entity.Quiz, err error)
-	CreateAttempt(answers dto.UserAnswersDto) error
+	GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *entity.Quiz, err error)
+	CreateAttempt(answers dto.UserAnswersDto) (attempt *entity.Attempt, err error)
 }
 
 type QuizService struct {
@@ -31,30 +31,30 @@ func (s *QuizService) GetAllQuizzes(page, pageSize int) (quiz *[]entity.Quiz, er
 	return s.QuizRepository.GetAllQuizzes(page, pageSize)
 }
 
-func (s *QuizService) GetQuizWithQuestionAndOption(quizParam dto.QuizParam) (quiz *entity.Quiz, err error) {
-	return s.QuizRepository.GetQuizWithQuestionAndOption(quizParam.QuizId)
+func (s *QuizService) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *entity.Quiz, err error) {
+	return s.QuizRepository.GetQuizWithQuestionAndOption(quizId)
 }
 
-func (s *QuizService) CreateAttempt(answers dto.UserAnswersDto) error {
+func (s *QuizService) CreateAttempt(answers dto.UserAnswersDto) (attempt *entity.Attempt, err error) {
 	var score int
 
 	for questionId, answerId := range answers.Answers {
 		correct, err := s.QuizRepository.IsCorrect(answerId)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if correct {
 			question, err := s.QuizRepository.GetQuestion(questionId)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			score += question.Score
 		}
 	}
 
-	attempt := &entity.Attempt{
+	attempt = &entity.Attempt{
 		Id:           uuid.New(),
 		UserId:       answers.UserId,
 		QuizId:       answers.QuizId,
@@ -62,5 +62,10 @@ func (s *QuizService) CreateAttempt(answers dto.UserAnswersDto) error {
 		FinishedTime: time.Now(),
 	}
 
-	return s.QuizRepository.CreteAttempt(attempt)
+	err = s.QuizRepository.CreteAttempt(attempt)
+	if err != nil {
+		return nil, err
+	}
+
+	return attempt, nil
 }
