@@ -1,8 +1,6 @@
 package entity
 
 import (
-	"time"
-
 	"github.com/google/uuid"
 )
 
@@ -28,12 +26,4 @@ type Option struct {
 	IsCorrect  bool      `json:"is_correct" db:"is_correct"`
 	Text       string    `json:"text" db:"text"`
 	Image      string    `json:"image" db:"image"`
-}
-
-type Attempt struct {
-	Id           uuid.UUID `json:"id" db:"attempt_id"`
-	UserId       uuid.UUID `json:"user_id" db:"user_id"`
-	QuizId       uuid.UUID `json:"quiz_id" db:"quiz_id"`
-	TotalScore   int       `json:"total_score" db:"total_score"`
-	FinishedTime time.Time `json:"finished_time" db:"finished_time"`
 }

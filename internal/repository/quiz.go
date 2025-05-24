@@ -15,10 +15,8 @@ type IQuizRepository interface {
 	GetAllQuizzes(page, pageSize int) (quiz *[]entity.Quiz, err error)
 	GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *entity.Quiz, err error)
 	GetQuiz(quizParam dto.QuizParam) (quiz *entity.Quiz, err error)
-	CreteAttempt(attempt *entity.Attempt) error
 	IsCorrect(OptionId uuid.UUID) (correct bool, err error)
 	GetQuestion(questionId uuid.UUID) (question *entity.Question, err error)
-	GetBestAttempt(userId uuid.UUID, quizId uuid.UUID) (attempt *entity.Attempt, err error)
 }
 
 type QuizRepository struct {
@@ -118,15 +116,6 @@ func (r *QuizRepository) GetQuiz(quizParam dto.QuizParam) (quiz *entity.Quiz, er
 	return quiz, nil
 }
 
-func (r *QuizRepository) CreteAttempt(attempt *entity.Attempt) error {
-	query := `
-		INSERT INTO attempts (id, user_id, quiz_id, total_score, finished_time)
-		VALUES ($1, $2, $3, $4, $5)
-	`
-	_, err := r.db.Exec(query, attempt.Id, attempt.UserId, attempt.QuizId, attempt.TotalScore, attempt.FinishedTime)
-	return err
-}
-
 func (r *QuizRepository) IsCorrect(OptionId uuid.UUID) (correct bool, err error) {
 	option := &entity.Option{}
 	query := `SELECT * FROM options WHERE id = $1`
@@ -153,15 +142,4 @@ func (r *QuizRepository) GetQuestion(questionId uuid.UUID) (question *entity.Que
 		return nil, err
 	}
 	return question, nil
-}
-
-func (r *QuizRepository) GetBestAttempt(userId uuid.UUID, quizId uuid.UUID) (attempt *entity.Attempt, err error) {
-	attempt = &entity.Attempt{}
-	query := `SELECT * FROM attempts WHERE user_id = $1 AND quiz_id = $2 ORDER BY total_score DESC LIMIT 1`
-	err = r.db.Get(attempt, query, userId, quizId)
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, &response.AttemptNotFound
-	}
-
-	return attempt, err
 }

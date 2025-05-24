@@ -26,6 +26,7 @@ func (r *Route) RegisterRoutes(port string) error {
 
 	mountAuth(routerGroup, r.handler)
 	mountQuiz(routerGroup, r.handler, r.middleware)
+	mountAttempt(routerGroup, r.handler, r.middleware)
 
 	return r.app.Listen(":" + port)
 }
@@ -44,4 +45,12 @@ func mountQuiz(routerGroup fiber.Router, handler rest.Handler, middleware middle
 	quiz.Get("/", middleware.Authentication, handler.GetAllQuizzes)
 	quiz.Get("/:id/questions/options", middleware.Authentication, handler.GetQuizWithQuestionAndOption)
 	quiz.Post("/attempts", middleware.Authentication, handler.CreateAttempt)
+}
+
+func mountAttempt(routerGroup fiber.Router, handler rest.Handler, middleware middleware.IMiddleware) {
+	quiz := routerGroup.Group("/attempts")
+
+	quiz.Post("/", middleware.Authentication, handler.CreateAttempt)
+	quiz.Get("/user", middleware.Authentication, handler.GetUserAttempt)
+	quiz.Get("/quiz/:quizId", middleware.Authentication, handler.GetQuizAttempt)
 }
