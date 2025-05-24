@@ -26,3 +26,17 @@ func (h *Handler) CreateAttempt(ctx *fiber.Ctx) error {
 
 	return response.HttpSuccess(ctx, "success", attempt)
 }
+
+func (h *Handler) GetUserAttempt(ctx *fiber.Ctx) error {
+	userId, ok := ctx.Locals("userId").(uuid.UUID)
+	if !ok {
+		return &response.Unauthorized
+	}
+
+	attempts, err := h.service.AttemptService.GetUserAttempt(userId)
+	if err != nil {
+		return err
+	}
+
+	return response.HttpSuccess(ctx, "success", attempts)
+}

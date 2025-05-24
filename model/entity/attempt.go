@@ -7,7 +7,7 @@ import (
 )
 
 type Attempt struct {
-	Id           uuid.UUID `json:"id" db:"attempt_id"`
+	Id           uuid.UUID `json:"id" db:"id"`
 	UserId       uuid.UUID `json:"user_id" db:"user_id"`
 	QuizId       uuid.UUID `json:"quiz_id" db:"quiz_id"`
 	TotalScore   int       `json:"total_score" db:"total_score"`

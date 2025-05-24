@@ -1,13 +1,19 @@
 package repository
 
 import (
+	"database/sql"
+	"errors"
 	"quizit-be/model/entity"
+	"quizit-be/pkg/response"
 
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
 type IAttemptRepository interface {
 	CreteAttempt(attempt *entity.Attempt) error
+	GetUserAttempt(userId uuid.UUID) (attempts *[]entity.Attempt, err error)
+	GetBestAttempt(userId uuid.UUID, quizId uuid.UUID) (attempt *entity.Attempt, err error)
 }
 
 type AttemptRepository struct {
@@ -27,4 +33,27 @@ func (r *AttemptRepository) CreteAttempt(attempt *entity.Attempt) error {
 	`
 	_, err := r.db.Exec(query, attempt.Id, attempt.UserId, attempt.QuizId, attempt.TotalScore, attempt.FinishedTime)
 	return err
+}
+
+func (r *AttemptRepository) GetUserAttempt(userId uuid.UUID) (attempts *[]entity.Attempt, err error) {
+	attempts = &[]entity.Attempt{}
+	query := `SELECT * FROM attempts WHERE user_id = $1`
+	err = r.db.Select(attempts, query, userId)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, &response.AttemptNotFound
+	}
+
+	return attempts, err
+}
+
+func (r *AttemptRepository) GetBestAttempt(userId uuid.UUID, quizId uuid.UUID) (attempt *entity.Attempt, err error) {
+	attempt = &entity.Attempt{}
+	query := `SELECT * FROM attempts WHERE user_id = $1 AND quiz_id = $2 ORDER BY total_score DESC LIMIT 1`
+	err = r.db.Get(attempt, query, userId, quizId)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, &response.AttemptNotFound
+	}
+
+	return attempt, err
 }

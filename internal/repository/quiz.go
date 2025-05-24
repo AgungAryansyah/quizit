@@ -17,7 +17,6 @@ type IQuizRepository interface {
 	GetQuiz(quizParam dto.QuizParam) (quiz *entity.Quiz, err error)
 	IsCorrect(OptionId uuid.UUID) (correct bool, err error)
 	GetQuestion(questionId uuid.UUID) (question *entity.Question, err error)
-	GetBestAttempt(userId uuid.UUID, quizId uuid.UUID) (attempt *entity.Attempt, err error)
 }
 
 type QuizRepository struct {
@@ -143,15 +142,4 @@ func (r *QuizRepository) GetQuestion(questionId uuid.UUID) (question *entity.Que
 		return nil, err
 	}
 	return question, nil
-}
-
-func (r *QuizRepository) GetBestAttempt(userId uuid.UUID, quizId uuid.UUID) (attempt *entity.Attempt, err error) {
-	attempt = &entity.Attempt{}
-	query := `SELECT * FROM attempts WHERE user_id = $1 AND quiz_id = $2 ORDER BY total_score DESC LIMIT 1`
-	err = r.db.Get(attempt, query, userId, quizId)
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, &response.AttemptNotFound
-	}
-
-	return attempt, err
 }
