@@ -11,7 +11,8 @@ import (
 
 type IAttemptService interface {
 	CreateAttempt(answers dto.UserAnswersDto, userId uuid.UUID) (attempt *entity.Attempt, err error)
-	GetUserAttempt(userId uuid.UUID) (attempts *[]entity.Attempt, err error)
+	GetUserAttempt(userId uuid.UUID, page, pageSize int) (attempts *[]entity.Attempt, err error)
+	GetQuizAttempt(quizId uuid.UUID, page, pageSize int) (attempts *[]entity.Attempt, err error)
 }
 
 type AttemptService struct {
@@ -61,6 +62,10 @@ func (s *AttemptService) CreateAttempt(answers dto.UserAnswersDto, userId uuid.U
 	return attempt, nil
 }
 
-func (s *AttemptService) GetUserAttempt(userId uuid.UUID) (attempts *[]entity.Attempt, err error) {
-	return s.AttemptRepository.GetUserAttempt(userId)
+func (s *AttemptService) GetUserAttempt(userId uuid.UUID, page, pageSize int) (attempts *[]entity.Attempt, err error) {
+	return s.AttemptRepository.GetUserAttempt(userId, page, pageSize)
+}
+
+func (s *AttemptService) GetQuizAttempt(quizId uuid.UUID, page, pageSize int) (attempts *[]entity.Attempt, err error) {
+	return s.AttemptRepository.GetQuizAttempt(quizId, page, pageSize)
 }

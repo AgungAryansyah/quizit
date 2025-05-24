@@ -12,7 +12,8 @@ import (
 
 type IAttemptRepository interface {
 	CreteAttempt(attempt *entity.Attempt) error
-	GetUserAttempt(userId uuid.UUID) (attempts *[]entity.Attempt, err error)
+	GetUserAttempt(userId uuid.UUID, page, pageSize int) (attempts *[]entity.Attempt, err error)
+	GetQuizAttempt(quizId uuid.UUID, page, pageSize int) (attempts *[]entity.Attempt, err error)
 	GetBestAttempt(userId uuid.UUID, quizId uuid.UUID) (attempt *entity.Attempt, err error)
 }
 
@@ -35,10 +36,42 @@ func (r *AttemptRepository) CreteAttempt(attempt *entity.Attempt) error {
 	return err
 }
 
-func (r *AttemptRepository) GetUserAttempt(userId uuid.UUID) (attempts *[]entity.Attempt, err error) {
+func (r *AttemptRepository) GetUserAttempt(userId uuid.UUID, page, pageSize int) (attempts *[]entity.Attempt, err error) {
+	if page < 1 {
+		page = 1
+	}
+
+	if pageSize < 1 {
+		pageSize = 10
+	}
+
+	offset := (page - 1) * pageSize
+
 	attempts = &[]entity.Attempt{}
-	query := `SELECT * FROM attempts WHERE user_id = $1`
-	err = r.db.Select(attempts, query, userId)
+	query := `SELECT * FROM attempts WHERE user_id = $1 LIMIT $2 OFFSET $3`
+	err = r.db.Select(attempts, query, userId, pageSize, offset)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, &response.AttemptNotFound
+	}
+
+	return attempts, err
+}
+
+func (r *AttemptRepository) GetQuizAttempt(quizId uuid.UUID, page, pageSize int) (attempts *[]entity.Attempt, err error) {
+	if page < 1 {
+		page = 1
+	}
+
+	if pageSize < 1 {
+		pageSize = 10
+	}
+
+	offset := (page - 1) * pageSize
+
+	attempts = &[]entity.Attempt{}
+	query := `SELECT * FROM attempts WHERE quiz_id = $1 LIMIT $2 OFFSET $3`
+	err = r.db.Select(attempts, query, quizId, pageSize, offset)
 
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, &response.AttemptNotFound
