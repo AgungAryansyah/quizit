@@ -10,7 +10,7 @@ import (
 )
 
 type IAttemptService interface {
-	CreateAttempt(answers dto.UserAnswersDto) (attempt *entity.Attempt, err error)
+	CreateAttempt(answers dto.UserAnswersDto, userId uuid.UUID) (attempt *entity.Attempt, err error)
 }
 
 type AttemptService struct {
@@ -25,7 +25,7 @@ func NewAttemptService(AttemptRepository repository.IAttemptRepository, QuizRepo
 	}
 }
 
-func (s *AttemptService) CreateAttempt(answers dto.UserAnswersDto) (attempt *entity.Attempt, err error) {
+func (s *AttemptService) CreateAttempt(answers dto.UserAnswersDto, userId uuid.UUID) (attempt *entity.Attempt, err error) {
 	var score int
 
 	for questionId, answerId := range answers.Answers {
@@ -46,7 +46,7 @@ func (s *AttemptService) CreateAttempt(answers dto.UserAnswersDto) (attempt *ent
 
 	attempt = &entity.Attempt{
 		Id:           uuid.New(),
-		UserId:       answers.UserId,
+		UserId:       userId,
 		QuizId:       answers.QuizId,
 		TotalScore:   score,
 		FinishedTime: time.Now(),

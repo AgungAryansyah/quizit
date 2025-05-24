@@ -5,6 +5,7 @@ import (
 	"quizit-be/pkg/response"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 func (h *Handler) CreateAttempt(ctx *fiber.Ctx) error {
@@ -13,7 +14,12 @@ func (h *Handler) CreateAttempt(ctx *fiber.Ctx) error {
 		return &response.BadRequest
 	}
 
-	attempt, err := h.service.AttemptService.CreateAttempt(answers)
+	userId, ok := ctx.Locals("userId").(uuid.UUID)
+	if !ok {
+		return &response.Unauthorized
+	}
+
+	attempt, err := h.service.AttemptService.CreateAttempt(answers, userId)
 	if err != nil {
 		return err
 	}
