@@ -13,10 +13,13 @@ import (
 
 type IQuizRepository interface {
 	GetAllQuizzes(page, pageSize int) (quiz *[]entity.Quiz, err error)
-	GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *entity.Quiz, err error)
-	GetQuiz(quizParam dto.QuizParam) (quiz *entity.Quiz, err error)
+	GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *dto.QuizDto, err error)
+	GetQuiz(quizId uuid.UUID) (quiz *entity.Quiz, err error)
 	IsCorrect(OptionId uuid.UUID) (correct bool, err error)
 	GetQuestion(questionId uuid.UUID) (question *entity.Question, err error)
+	CreateQuiz(quiz *entity.Quiz) error
+	CreateQuestion(question *entity.Question) error
+	CreateOption(option *entity.Option) error
 }
 
 type QuizRepository struct {
@@ -49,9 +52,9 @@ func (r *QuizRepository) GetAllQuizzes(page, pageSize int) (quiz *[]entity.Quiz,
 	return quizzes, err
 }
 
-func (r *QuizRepository) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *entity.Quiz, err error) {
-	quiz = &entity.Quiz{}
-	query := `SELECT id, theme, title FROM quizzes WHERE id = $1`
+func (r *QuizRepository) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *dto.QuizDto, err error) {
+	quiz = &dto.QuizDto{}
+	query := `SELECT id, theme, title, user_id FROM quizzes WHERE id = $1`
 	err = r.db.Get(quiz, query, quizId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -60,7 +63,7 @@ func (r *QuizRepository) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *e
 		return nil, err
 	}
 
-	var questions []entity.Question
+	var questions []dto.QuestionDto
 	query = `
         SELECT id, quiz_id, score, text, image
         FROM questions WHERE quiz_id = $1
@@ -73,9 +76,9 @@ func (r *QuizRepository) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *e
 		return nil, err
 	}
 
-	var options []entity.Option
+	var options []dto.OptionDto
 	query = `
-        SELECT id, question_id, is_correct, text, image
+        SELECT id, question_id, text, image
         FROM options WHERE question_id IN (
             SELECT id FROM questions WHERE quiz_id = $1
         )
@@ -88,7 +91,7 @@ func (r *QuizRepository) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *e
 		return nil, err
 	}
 
-	optionsByQuestion := make(map[uuid.UUID][]entity.Option)
+	optionsByQuestion := make(map[uuid.UUID][]dto.OptionDto)
 	for _, opt := range options {
 		optionsByQuestion[opt.QuestionId] = append(optionsByQuestion[opt.QuestionId], opt)
 	}
@@ -102,10 +105,10 @@ func (r *QuizRepository) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *e
 	return quiz, nil
 }
 
-func (r *QuizRepository) GetQuiz(quizParam dto.QuizParam) (quiz *entity.Quiz, err error) {
+func (r *QuizRepository) GetQuiz(quizId uuid.UUID) (quiz *entity.Quiz, err error) {
 	quiz = &entity.Quiz{}
-	query := `SELECT id, theme, title FROM quizzes WHERE id = $1`
-	err = r.db.Get(quiz, query, quizParam.QuizId)
+	query := `SELECT * FROM quizzes WHERE id = $1`
+	err = r.db.Get(quiz, query, quizId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, &response.QuizNotFound
@@ -142,4 +145,31 @@ func (r *QuizRepository) GetQuestion(questionId uuid.UUID) (question *entity.Que
 		return nil, err
 	}
 	return question, nil
+}
+
+func (r *QuizRepository) CreateQuiz(quiz *entity.Quiz) error {
+	query := `
+		INSERT INTO quizzes (id, theme, title, user_id)
+		VALUES ($1, $2, $3, $4)	
+	`
+	_, err := r.db.Exec(query, quiz.Id, quiz.Theme, quiz.Title, quiz.UserId)
+	return err
+}
+
+func (r *QuizRepository) CreateQuestion(question *entity.Question) error {
+	query := `
+		INSERT INTO questions (id, quiz_id, score, text, image)
+		VALUES ($1, $2, $3, $4, $5)	
+	`
+	_, err := r.db.Exec(query, question.Id, question.QuizId, question.Score, question.Text, question.Image)
+	return err
+}
+
+func (r *QuizRepository) CreateOption(option *entity.Option) error {
+	query := `
+		INSERT INTO options (id, question_id, is_correct, text, image)
+		VALUES ($1, $2, $3, $4, $5)	
+	`
+	_, err := r.db.Exec(query, option.Id, option.QuestionId, option.IsCorrect, option.Text, option.Image)
+	return err
 }

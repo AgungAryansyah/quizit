@@ -5,9 +5,10 @@ import (
 )
 
 type Quiz struct {
-	Id        uuid.UUID  `json:"id" db:"id" `
+	Id        uuid.UUID  `json:"id" db:"id"`
 	Theme     string     `json:"theme" db:"theme"`
 	Title     string     `json:"title" db:"title"`
+	UserId    uuid.UUID  `json:"user_id" db:"user_id"`
 	Questions []Question `json:"questions" db:"questions"`
 }
 

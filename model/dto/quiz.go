@@ -15,21 +15,42 @@ type CreateAttempt struct {
 }
 
 type QuizDto struct {
-	QuizId    uuid.UUID     `json:"quiz_id"`
-	Theme     string        `json:"theme"`
-	Title     string        `json:"title"`
-	Questions []QuestionDto `json:"questions"`
+	Id        uuid.UUID     `json:"id" db:"id"`
+	Theme     string        `json:"theme" db:"theme"`
+	Title     string        `json:"title" db:"title"`
+	UserId    uuid.UUID     `json:"user_id" db:"user_id"`
+	Questions []QuestionDto `json:"questions" db:"questions"`
 }
 
 type QuestionDto struct {
-	QuestionId    uuid.UUID   `json:"question_id"`
-	QuestionText  string      `json:"question_text"`
-	QuestionImage string      `json:"question_image"`
-	Options       []OptionDto `json:"options"`
+	Id      uuid.UUID   `json:"id" db:"id"`
+	QuizId  uuid.UUID   `json:"quiz_id" db:"quiz_id"`
+	Score   int         `json:"score" db:"score"`
+	Text    string      `json:"text" db:"text"`
+	Image   string      `json:"image" db:"image"`
+	Options []OptionDto `json:"options" db:"options"`
 }
 
 type OptionDto struct {
-	OptionId    uuid.UUID `json:"option_id"`
-	OptionText  string    `json:"option_text"`
-	OptionImage string    `json:"option_image"`
+	Id         uuid.UUID `json:"id" db:"id"`
+	QuestionId uuid.UUID `json:"question_id" db:"question_id"`
+	Text       string    `json:"text" db:"text"`
+	Image      string    `json:"image" db:"image"`
+}
+
+type CreateQuiz struct {
+	Theme string `json:"theme"`
+	Title string `json:"title"`
+}
+
+type CreateQuestion struct {
+	QuizId uuid.UUID `json:"quiz_id" db:"quiz_id"`
+	Score  int       `json:"score" db:"score"`
+	Text   string    `json:"text" db:"text"`
+}
+
+type CreateOption struct {
+	QuestionId uuid.UUID `json:"question_id" db:"question_id"`
+	IsCorrect  bool      `json:"is_correct" db:"is_correct"`
+	Text       string    `json:"text" db:"text"`
 }
