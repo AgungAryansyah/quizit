@@ -19,6 +19,7 @@ type IQuizRepository interface {
 	GetQuestion(questionId uuid.UUID) (question *entity.Question, err error)
 	CreateQuiz(quiz *entity.Quiz) error
 	CreateQuestion(question *entity.Question) error
+	CreateOption(option *entity.Option) error
 }
 
 type QuizRepository struct {
@@ -161,5 +162,14 @@ func (r *QuizRepository) CreateQuestion(question *entity.Question) error {
 		VALUES ($1, $2, $3, $4, $5)	
 	`
 	_, err := r.db.Exec(query, question.Id, question.QuizId, question.Score, question.Text, question.Image)
+	return err
+}
+
+func (r *QuizRepository) CreateOption(option *entity.Option) error {
+	query := `
+		INSERT INTO options (id, question_id, is_correct, text, image)
+		VALUES ($1, $2, $3, $4, $5)	
+	`
+	_, err := r.db.Exec(query, option.Id, option.QuestionId, option.IsCorrect, option.Text, option.Image)
 	return err
 }

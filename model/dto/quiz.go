@@ -48,3 +48,9 @@ type CreateQuestion struct {
 	Score  int       `json:"score" db:"score"`
 	Text   string    `json:"text" db:"text"`
 }
+
+type CreateOption struct {
+	QuestionId uuid.UUID `json:"question_id" db:"question_id"`
+	IsCorrect  bool      `json:"is_correct" db:"is_correct"`
+	Text       string    `json:"text" db:"text"`
+}

@@ -14,6 +14,7 @@ type IQuizService interface {
 	GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *dto.QuizDto, err error)
 	CreateQuiz(createQuiz *dto.CreateQuiz, userId uuid.UUID) (quiz *entity.Quiz, err error)
 	CreateQuestion(createQuestion *dto.CreateQuestion, userId uuid.UUID) (question *entity.Question, err error)
+	CreateOption(createOption *dto.CreateOption, userId uuid.UUID) (option *entity.Option, err error)
 }
 
 type QuizService struct {
@@ -76,4 +77,35 @@ func (s *QuizService) CreateQuestion(createQuestion *dto.CreateQuestion, userId 
 	}
 
 	return question, nil
+}
+
+func (s *QuizService) CreateOption(createOption *dto.CreateOption, userId uuid.UUID) (option *entity.Option, err error) {
+	question, err := s.QuizRepository.GetQuestion(createOption.QuestionId)
+	if err != nil {
+		return nil, err
+	}
+
+	quiz, err := s.QuizRepository.GetQuiz(question.QuizId)
+	if err != nil {
+		return nil, err
+	}
+
+	if quiz.UserId != userId {
+		return nil, &response.Forbidden
+	}
+
+	option = &entity.Option{
+		Id:         uuid.New(),
+		QuestionId: createOption.QuestionId,
+		IsCorrect:  createOption.IsCorrect,
+		Text:       createOption.Text,
+		Image:      "",
+	}
+
+	err = s.QuizRepository.CreateOption(option)
+	if err != nil {
+		return nil, err
+	}
+
+	return option, nil
 }

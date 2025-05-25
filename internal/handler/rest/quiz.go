@@ -71,3 +71,22 @@ func (h *Handler) CreateQuestion(ctx *fiber.Ctx) error {
 
 	return response.HttpSuccess(ctx, "success", question)
 }
+
+func (h *Handler) CreateOption(ctx *fiber.Ctx) error {
+	userId, ok := ctx.Locals("userId").(uuid.UUID)
+	if !ok {
+		return &response.Unauthorized
+	}
+
+	var createOption dto.CreateOption
+	if err := ctx.BodyParser(&createOption); err != nil {
+		return &response.BadRequest
+	}
+
+	option, err := h.service.QuizService.CreateOption(&createOption, userId)
+	if err != nil {
+		return err
+	}
+
+	return response.HttpSuccess(ctx, "success", option)
+}
