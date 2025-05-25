@@ -15,8 +15,9 @@ import ProtectedRoute from "./components/Auth/ProtectedRoute"
 function App() {
   return (
     <Router>
-      <Layout>
-        <Routes>
+      <Routes>
+        {/* Wrap all routes inside Layout */}
+        <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -78,8 +79,8 @@ function App() {
               </ProtectedRoute>
             }
           />
-        </Routes>
-      </Layout>
+        </Route>
+      </Routes>
     </Router>
   )
 }
