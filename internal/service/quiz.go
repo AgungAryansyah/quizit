@@ -4,6 +4,7 @@ import (
 	"quizit-be/internal/repository"
 	"quizit-be/model/dto"
 	"quizit-be/model/entity"
+	"quizit-be/pkg/response"
 
 	"github.com/google/uuid"
 )
@@ -12,6 +13,7 @@ type IQuizService interface {
 	GetAllQuizzes(page, pageSize int) (quiz *[]entity.Quiz, err error)
 	GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *dto.QuizDto, err error)
 	CreateQuiz(createQuiz *dto.CreateQuiz, userId uuid.UUID) (quiz *entity.Quiz, err error)
+	CreateQuestion(createQuestion *dto.CreateQuestion, userId uuid.UUID) (question *entity.Question, err error)
 }
 
 type QuizService struct {
@@ -48,4 +50,30 @@ func (s *QuizService) CreateQuiz(createQuiz *dto.CreateQuiz, userId uuid.UUID) (
 	}
 
 	return quiz, nil
+}
+
+func (s *QuizService) CreateQuestion(createQuestion *dto.CreateQuestion, userId uuid.UUID) (question *entity.Question, err error) {
+	quiz, err := s.QuizRepository.GetQuiz(createQuestion.QuizId)
+	if err != nil {
+		return nil, err
+	}
+
+	if quiz.UserId != userId {
+		return nil, &response.Forbidden
+	}
+
+	question = &entity.Question{
+		Id:     uuid.New(),
+		QuizId: createQuestion.QuizId,
+		Score:  createQuestion.Score,
+		Text:   createQuestion.Text,
+		Image:  "",
+	}
+
+	err = s.QuizRepository.CreateQuestion(question)
+	if err != nil {
+		return nil, err
+	}
+
+	return question, nil
 }

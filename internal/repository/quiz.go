@@ -14,10 +14,11 @@ import (
 type IQuizRepository interface {
 	GetAllQuizzes(page, pageSize int) (quiz *[]entity.Quiz, err error)
 	GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *dto.QuizDto, err error)
-	GetQuiz(quizParam dto.QuizParam) (quiz *entity.Quiz, err error)
+	GetQuiz(quizId uuid.UUID) (quiz *entity.Quiz, err error)
 	IsCorrect(OptionId uuid.UUID) (correct bool, err error)
 	GetQuestion(questionId uuid.UUID) (question *entity.Question, err error)
 	CreateQuiz(quiz *entity.Quiz) error
+	CreateQuestion(question *entity.Question) error
 }
 
 type QuizRepository struct {
@@ -103,10 +104,10 @@ func (r *QuizRepository) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *d
 	return quiz, nil
 }
 
-func (r *QuizRepository) GetQuiz(quizParam dto.QuizParam) (quiz *entity.Quiz, err error) {
+func (r *QuizRepository) GetQuiz(quizId uuid.UUID) (quiz *entity.Quiz, err error) {
 	quiz = &entity.Quiz{}
-	query := `SELECT id, theme, title FROM quizzes WHERE id = $1`
-	err = r.db.Get(quiz, query, quizParam.QuizId)
+	query := `SELECT * FROM quizzes WHERE id = $1`
+	err = r.db.Get(quiz, query, quizId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, &response.QuizNotFound
@@ -151,5 +152,14 @@ func (r *QuizRepository) CreateQuiz(quiz *entity.Quiz) error {
 		VALUES ($1, $2, $3, $4)	
 	`
 	_, err := r.db.Exec(query, quiz.Id, quiz.Theme, quiz.Title, quiz.UserId)
+	return err
+}
+
+func (r *QuizRepository) CreateQuestion(question *entity.Question) error {
+	query := `
+		INSERT INTO questions (id, quiz_id, score, text, image)
+		VALUES ($1, $2, $3, $4, $5)	
+	`
+	_, err := r.db.Exec(query, question.Id, question.QuizId, question.Score, question.Text, question.Image)
 	return err
 }

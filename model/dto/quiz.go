@@ -42,3 +42,9 @@ type CreateQuiz struct {
 	Theme string `json:"theme"`
 	Title string `json:"title"`
 }
+
+type CreateQuestion struct {
+	QuizId uuid.UUID `json:"quiz_id" db:"quiz_id"`
+	Score  int       `json:"score" db:"score"`
+	Text   string    `json:"text" db:"text"`
+}
