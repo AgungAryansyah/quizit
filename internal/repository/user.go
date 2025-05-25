@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"errors"
+	"quizit-be/model/dto"
 	"quizit-be/model/entity"
 	"quizit-be/pkg/response"
 
@@ -15,6 +16,7 @@ type IUserRepository interface {
 	CreateUser(user *entity.User) error
 	GetUserByEmail(email string) (user *entity.User, err error)
 	GetUser(userId uuid.UUID) (user *entity.User, err error)
+	GetProfile(userId uuid.UUID) (user *dto.UserDto, err error)
 }
 
 type UserRepository struct {
@@ -42,6 +44,17 @@ func (r *UserRepository) CreateUser(user *entity.User) error {
 func (r *UserRepository) GetUser(userId uuid.UUID) (user *entity.User, err error) {
 	user = &entity.User{}
 	query := `SELECT * FROM users WHERE id = $1`
+	err = r.db.Get(user, query, userId)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, &response.UserNotFound
+	}
+
+	return user, err
+}
+
+func (r *UserRepository) GetProfile(userId uuid.UUID) (user *dto.UserDto, err error) {
+	user = &dto.UserDto{}
+	query := `SELECT id, name, profile_picture, email FROM users WHERE id = $1`
 	err = r.db.Get(user, query, userId)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, &response.UserNotFound
