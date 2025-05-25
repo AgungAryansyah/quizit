@@ -15,7 +15,7 @@ func Start() *fiber.App {
 	)
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "*", //should be updated for prod
+		AllowOrigins:     "http://localhost:5173", //should be updated for prod
 		AllowMethods:     "GET, POST, DELETE, PATCH, PUT",
 		AllowHeaders:     "Content-Type, Authorization, X-Requested-With",
 		AllowCredentials: true,
