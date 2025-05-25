@@ -18,6 +18,7 @@ type QuizDto struct {
 	Id        uuid.UUID     `json:"id" db:"id"`
 	Theme     string        `json:"theme" db:"theme"`
 	Title     string        `json:"title" db:"title"`
+	UserId    uuid.UUID     `json:"user_id" db:"user_id"`
 	Questions []QuestionDto `json:"questions" db:"questions"`
 }
 
@@ -35,4 +36,9 @@ type OptionDto struct {
 	QuestionId uuid.UUID `json:"question_id" db:"question_id"`
 	Text       string    `json:"text" db:"text"`
 	Image      string    `json:"image" db:"image"`
+}
+
+type CreateQuiz struct {
+	Theme string `json:"theme"`
+	Title string `json:"title"`
 }

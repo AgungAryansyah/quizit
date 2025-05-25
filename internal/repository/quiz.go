@@ -17,6 +17,7 @@ type IQuizRepository interface {
 	GetQuiz(quizParam dto.QuizParam) (quiz *entity.Quiz, err error)
 	IsCorrect(OptionId uuid.UUID) (correct bool, err error)
 	GetQuestion(questionId uuid.UUID) (question *entity.Question, err error)
+	CreateQuiz(quiz *entity.Quiz) error
 }
 
 type QuizRepository struct {
@@ -51,7 +52,7 @@ func (r *QuizRepository) GetAllQuizzes(page, pageSize int) (quiz *[]entity.Quiz,
 
 func (r *QuizRepository) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *dto.QuizDto, err error) {
 	quiz = &dto.QuizDto{}
-	query := `SELECT id, theme, title FROM quizzes WHERE id = $1`
+	query := `SELECT id, theme, title, user_id FROM quizzes WHERE id = $1`
 	err = r.db.Get(quiz, query, quizId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -142,4 +143,13 @@ func (r *QuizRepository) GetQuestion(questionId uuid.UUID) (question *entity.Que
 		return nil, err
 	}
 	return question, nil
+}
+
+func (r *QuizRepository) CreateQuiz(quiz *entity.Quiz) error {
+	query := `
+		INSERT INTO quizzes (id, theme, title, user_id)
+		VALUES ($1, $2, $3, $4)	
+	`
+	_, err := r.db.Exec(query, quiz.Id, quiz.Theme, quiz.Title, quiz.UserId)
+	return err
 }
