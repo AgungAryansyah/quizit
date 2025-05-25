@@ -24,7 +24,7 @@ func NewRoute(app *fiber.App, handler rest.Handler, middleware middleware.IMiddl
 func (r *Route) RegisterRoutes(port string) error {
 	routerGroup := r.app.Group("/api/v1")
 
-	mountAuth(routerGroup, r.handler)
+	mountAuth(routerGroup, r.handler, r.middleware)
 	mountQuiz(routerGroup, r.handler, r.middleware)
 	mountAttempt(routerGroup, r.handler, r.middleware)
 	mountUser(routerGroup, r.handler, r.middleware)
@@ -32,11 +32,12 @@ func (r *Route) RegisterRoutes(port string) error {
 	return r.app.Listen(":" + port)
 }
 
-func mountAuth(routerGroup fiber.Router, handler rest.Handler) {
+func mountAuth(routerGroup fiber.Router, handler rest.Handler, middleware middleware.IMiddleware) {
 	auth := routerGroup.Group("/auths")
 
 	auth.Post("/register", handler.Register)
 	auth.Post("/login", handler.Login)
+	auth.Post("/logout", middleware.Authentication, handler.Logout)
 	auth.Post("/refresh", handler.RefreshToken)
 }
 

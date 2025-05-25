@@ -2,10 +2,12 @@ package rest
 
 import (
 	"quizit-be/model/dto"
+	"quizit-be/pkg/response"
 	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 func (h *Handler) Register(ctx *fiber.Ctx) error {
@@ -18,10 +20,7 @@ func (h *Handler) Register(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	return ctx.JSON(fiber.Map{
-		"message": "success",
-		"payload": nil,
-	})
+	return response.HttpSuccess(ctx, "success", nil)
 }
 
 func (h *Handler) Login(ctx *fiber.Ctx) error {
@@ -60,10 +59,7 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 		SameSite: "None",
 	})
 
-	return ctx.JSON(fiber.Map{
-		"message": "success",
-		"payload": nil,
-	})
+	return response.HttpSuccess(ctx, "success", nil)
 }
 
 func (h *Handler) RefreshToken(ctx *fiber.Ctx) error {
@@ -97,10 +93,38 @@ func (h *Handler) RefreshToken(ctx *fiber.Ctx) error {
 		SameSite: "None",
 	})
 
-	return ctx.JSON(fiber.Map{
-		"message": "success",
-		"payload": nil,
+	return response.HttpSuccess(ctx, "success", nil)
+}
+
+func (h *Handler) Logout(ctx *fiber.Ctx) error {
+	userId, ok := ctx.Locals("userId").(uuid.UUID)
+	if !ok {
+		return &response.Unauthorized
+	}
+
+	if err := h.service.AuthService.Logout(userId); err != nil {
+		return err
+	}
+
+	ctx.Cookie(&fiber.Cookie{
+		Name:     "token",
+		Value:    "",
+		Expires:  time.Now().Add(-time.Hour),
+		HTTPOnly: true,
+		Secure:   false,
+		Path:     "/",
 	})
+
+	ctx.Cookie(&fiber.Cookie{
+		Name:     "refresh_token",
+		Value:    "",
+		Expires:  time.Now().Add(-time.Hour),
+		HTTPOnly: true,
+		Secure:   false,
+		Path:     "/",
+	})
+
+	return response.HttpSuccess(ctx, "success", nil)
 }
 
 //todo: add global handler and validator
