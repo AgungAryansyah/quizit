@@ -21,15 +21,22 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem("authToken")
     const userData = localStorage.getItem("user")
 
-    if (token && userData) {
-      setUser(JSON.parse(userData))
+    if (token && userData && userData !== "undefined" && userData !== "null") {
+      try {
+        setUser(JSON.parse(userData))
+      } catch (error) {
+        console.error("Error parsing user data:", error)
+        localStorage.removeItem("user")
+        localStorage.removeItem("authToken")
+        setUser(null)
+      }
     }
     setLoading(false)
   }, [])
 
   const login = async (email, password) => {
     try {
-      const response = await api.post("/auth/login", { email, password })
+      const response = await api.post("/v1/auths/login", { email, password })
       const { token, user: userData } = response.data
 
       localStorage.setItem("authToken", token)
@@ -47,7 +54,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (name, email, password) => {
     try {
-      const response = await api.post("/auth/register", { name, email, password })
+      const response = await api.post("/v1/auths/register", { name, email, password })
       const { token, user: userData } = response.data
 
       localStorage.setItem("authToken", token)
