@@ -49,24 +49,30 @@ const Login = () => {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-
-    const newErrors = validateForm()
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
-      return
-    }
-
-    setLoading(true)
-    const result = await login(formData.email, formData.password)
-
-    if (result.success) {
-      navigate("/dashboard")
-    } else {
-      setErrors({ general: result.error })
-    }
-    setLoading(false)
+  e.preventDefault();
+  
+  const newErrors = validateForm()
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors)
+    return
   }
+
+  setLoading(true);
+  try {
+    const result = await login(formData.email, formData.password);
+    
+    if (result.success) {
+      // Add slight delay to ensure context updates
+      setTimeout(() => navigate("/dashboard"), 100);
+    } else {
+      setErrors({ general: result.error });
+    }
+  } catch (error) {
+    setErrors({ general: "Login failed" });
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
