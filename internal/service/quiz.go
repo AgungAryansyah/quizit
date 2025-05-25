@@ -2,6 +2,7 @@ package service
 
 import (
 	"quizit-be/internal/repository"
+	"quizit-be/model/dto"
 	"quizit-be/model/entity"
 
 	"github.com/google/uuid"
@@ -9,7 +10,7 @@ import (
 
 type IQuizService interface {
 	GetAllQuizzes(page, pageSize int) (quiz *[]entity.Quiz, err error)
-	GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *entity.Quiz, err error)
+	GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *dto.QuizDto, err error)
 }
 
 type QuizService struct {
@@ -28,6 +29,6 @@ func (s *QuizService) GetAllQuizzes(page, pageSize int) (quiz *[]entity.Quiz, er
 	return s.QuizRepository.GetAllQuizzes(page, pageSize)
 }
 
-func (s *QuizService) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *entity.Quiz, err error) {
+func (s *QuizService) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *dto.QuizDto, err error) {
 	return s.QuizRepository.GetQuizWithQuestionAndOption(quizId)
 }

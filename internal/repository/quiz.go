@@ -13,7 +13,7 @@ import (
 
 type IQuizRepository interface {
 	GetAllQuizzes(page, pageSize int) (quiz *[]entity.Quiz, err error)
-	GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *entity.Quiz, err error)
+	GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *dto.QuizDto, err error)
 	GetQuiz(quizParam dto.QuizParam) (quiz *entity.Quiz, err error)
 	IsCorrect(OptionId uuid.UUID) (correct bool, err error)
 	GetQuestion(questionId uuid.UUID) (question *entity.Question, err error)
@@ -49,8 +49,8 @@ func (r *QuizRepository) GetAllQuizzes(page, pageSize int) (quiz *[]entity.Quiz,
 	return quizzes, err
 }
 
-func (r *QuizRepository) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *entity.Quiz, err error) {
-	quiz = &entity.Quiz{}
+func (r *QuizRepository) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *dto.QuizDto, err error) {
+	quiz = &dto.QuizDto{}
 	query := `SELECT id, theme, title FROM quizzes WHERE id = $1`
 	err = r.db.Get(quiz, query, quizId)
 	if err != nil {
@@ -60,7 +60,7 @@ func (r *QuizRepository) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *e
 		return nil, err
 	}
 
-	var questions []entity.Question
+	var questions []dto.QuestionDto
 	query = `
         SELECT id, quiz_id, score, text, image
         FROM questions WHERE quiz_id = $1
@@ -73,9 +73,9 @@ func (r *QuizRepository) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *e
 		return nil, err
 	}
 
-	var options []entity.Option
+	var options []dto.OptionDto
 	query = `
-        SELECT id, question_id, is_correct, text, image
+        SELECT id, question_id, text, image
         FROM options WHERE question_id IN (
             SELECT id FROM questions WHERE quiz_id = $1
         )
@@ -88,7 +88,7 @@ func (r *QuizRepository) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *e
 		return nil, err
 	}
 
-	optionsByQuestion := make(map[uuid.UUID][]entity.Option)
+	optionsByQuestion := make(map[uuid.UUID][]dto.OptionDto)
 	for _, opt := range options {
 		optionsByQuestion[opt.QuestionId] = append(optionsByQuestion[opt.QuestionId], opt)
 	}
