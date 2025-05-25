@@ -18,6 +18,7 @@ type IAuthService interface {
 	Register(register *dto.Register) error
 	Login(login *dto.LoginReq, expiry int) (res *dto.LoginRes, err error)
 	ReplaceToken(token string, expiry int) (res *dto.LoginRes, err error)
+	Logout(userId uuid.UUID) error
 }
 
 type AuthService struct {
@@ -124,6 +125,10 @@ func (s *AuthService) ReplaceToken(token string, expiry int) (res *dto.LoginRes,
 		Token:        token,
 		RefreshToken: refreshToken,
 	}, nil
+}
+
+func (s *AuthService) Logout(userId uuid.UUID) error {
+	return s.AuthRepository.DeleteSession(userId)
 }
 
 func generateRefreshToken(length int) (string, error) {
