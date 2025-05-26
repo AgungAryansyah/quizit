@@ -58,6 +58,7 @@ var (
 	QuestionNotFound = CustomErrorResponse(http.StatusNotFound, "Question not found")
 	OptionNotFound   = CustomErrorResponse(http.StatusNotFound, "Option not found")
 	AttemptNotFound  = CustomErrorResponse(http.StatusNotFound, "Attempt not found")
+	ArticleNotFound  = CustomErrorResponse(http.StatusNotFound, "Article not found")
 
 	InvalidToken       = CustomErrorResponse(http.StatusUnauthorized, "Token invalid")
 	ExpiredToken       = CustomErrorResponse(http.StatusUnauthorized, "Expired token")

@@ -7,6 +7,7 @@ type Repository struct {
 	UserRepository    IUserRepository
 	QuizRepository    IQuizRepository
 	AttemptRepository IAttemptRepository
+	ArticleRepository IArticleRepository
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
@@ -15,5 +16,6 @@ func NewRepository(db *sqlx.DB) *Repository {
 		UserRepository:    NewUserRepository(db),
 		QuizRepository:    NewQuizRepository(db),
 		AttemptRepository: NewAttemptRepository(db),
+		ArticleRepository: NewArticleRepository(db),
 	}
 }
