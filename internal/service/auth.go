@@ -1,13 +1,12 @@
 package service
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"quizit-be/internal/repository"
 	"quizit-be/model/dto"
 	"quizit-be/model/entity"
 	"quizit-be/pkg/jwt"
 	"quizit-be/pkg/response"
+	"quizit-be/pkg/util"
 	"time"
 
 	"github.com/google/uuid"
@@ -72,7 +71,7 @@ func (s *AuthService) Login(login *dto.LoginReq, expiry int) (res *dto.LoginRes,
 		return nil, err
 	}
 
-	refreshToken, err := generateRefreshToken(64)
+	refreshToken, err := util.GenerateRandomString(64)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +110,7 @@ func (s *AuthService) ReplaceToken(token string, expiry int) (res *dto.LoginRes,
 		return nil, err
 	}
 
-	refreshToken, err := generateRefreshToken(64)
+	refreshToken, err := util.GenerateRandomString(64)
 	if err != nil {
 		return nil, err
 	}
@@ -129,20 +128,4 @@ func (s *AuthService) ReplaceToken(token string, expiry int) (res *dto.LoginRes,
 
 func (s *AuthService) Logout(userId uuid.UUID) error {
 	return s.AuthRepository.DeleteSession(userId)
-}
-
-func generateRefreshToken(length int) (string, error) {
-	bytes := make([]byte, length*3/4)
-
-	_, err := rand.Read(bytes)
-	if err != nil {
-		return "", err
-	}
-
-	token := base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(bytes)
-
-	if len(token) > length {
-		token = token[:length]
-	}
-	return token, nil
 }
