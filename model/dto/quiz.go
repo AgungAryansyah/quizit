@@ -49,3 +49,8 @@ type CreateOption struct {
 	IsCorrect bool   `json:"is_correct"`
 	Text      string `json:"text"`
 }
+
+type CreateQuizRes struct {
+	Id       uuid.UUID `json:"id"`
+	QuizCode string    `json:"quiz_code"`
+}

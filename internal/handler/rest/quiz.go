@@ -45,10 +45,10 @@ func (h *Handler) CreateQuiz(ctx *fiber.Ctx) error {
 		return &response.BadRequest
 	}
 
-	quizId, err := h.service.QuizService.CreateQuiz(&createQuiz, userId)
+	res, err := h.service.QuizService.CreateQuiz(&createQuiz, userId)
 	if err != nil {
 		return err
 	}
 
-	return response.HttpSuccess(ctx, "success", quizId)
+	return response.HttpSuccess(ctx, "success", res)
 }
