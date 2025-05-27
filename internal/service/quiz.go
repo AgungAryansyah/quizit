@@ -4,7 +4,7 @@ import (
 	"quizit-be/internal/repository"
 	"quizit-be/model/dto"
 	"quizit-be/model/entity"
-	"quizit-be/pkg/response"
+	"quizit-be/pkg/util"
 
 	"github.com/google/uuid"
 )
@@ -12,9 +12,7 @@ import (
 type IQuizService interface {
 	GetAllQuizzes(page, pageSize int) (quiz *[]entity.Quiz, err error)
 	GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *dto.QuizDto, err error)
-	CreateQuiz(createQuiz *dto.CreateQuiz, userId uuid.UUID) (quiz *entity.Quiz, err error)
-	CreateQuestion(createQuestion *dto.CreateQuestion, userId uuid.UUID) (question *entity.Question, err error)
-	CreateOption(createOption *dto.CreateOption, userId uuid.UUID) (option *entity.Option, err error)
+	CreateQuiz(createQuiz *dto.CreateQuiz, userId uuid.UUID) (*uuid.UUID, error)
 }
 
 type QuizService struct {
@@ -37,12 +35,19 @@ func (s *QuizService) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *dto.
 	return s.QuizRepository.GetQuizWithQuestionAndOption(quizId)
 }
 
-func (s *QuizService) CreateQuiz(createQuiz *dto.CreateQuiz, userId uuid.UUID) (quiz *entity.Quiz, err error) {
-	quiz = &entity.Quiz{
-		Id:     uuid.New(),
-		Theme:  createQuiz.Theme,
-		Title:  createQuiz.Title,
-		UserId: userId,
+func (s *QuizService) CreateQuiz(createQuiz *dto.CreateQuiz, userId uuid.UUID) (*uuid.UUID, error) {
+	quizId := uuid.New()
+	quizCode, err := util.GenerateRandomString(6)
+	if err != nil {
+		return nil, err
+	}
+
+	quiz := &entity.Quiz{
+		Id:       quizId,
+		Theme:    createQuiz.Theme,
+		Title:    createQuiz.Title,
+		UserId:   userId,
+		QuizCode: quizCode,
 	}
 
 	err = s.QuizRepository.CreateQuiz(quiz)
@@ -50,62 +55,40 @@ func (s *QuizService) CreateQuiz(createQuiz *dto.CreateQuiz, userId uuid.UUID) (
 		return nil, err
 	}
 
-	return quiz, nil
-}
+	for _, createQuestion := range createQuiz.Questions {
+		questionId := uuid.New()
 
-func (s *QuizService) CreateQuestion(createQuestion *dto.CreateQuestion, userId uuid.UUID) (question *entity.Question, err error) {
-	quiz, err := s.QuizRepository.GetQuiz(createQuestion.QuizId)
-	if err != nil {
-		return nil, err
+		question := &entity.Question{
+			Id:     questionId,
+			QuizId: quizId,
+			Score:  createQuestion.Score,
+			Text:   createQuestion.Text,
+			Image:  "",
+		}
+
+		err = s.QuizRepository.CreateQuestion(question)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, createOption := range createQuestion.Options {
+			optionId := uuid.New()
+
+			option := &entity.Option{
+				Id:         optionId,
+				QuestionId: questionId,
+				IsCorrect:  createOption.IsCorrect,
+				Text:       createOption.Text,
+				Image:      "",
+			}
+
+			err = s.QuizRepository.CreateOption(option)
+			if err != nil {
+				return nil, err
+			}
+		}
+
 	}
 
-	if quiz.UserId != userId {
-		return nil, &response.Forbidden
-	}
-
-	question = &entity.Question{
-		Id:     uuid.New(),
-		QuizId: createQuestion.QuizId,
-		Score:  createQuestion.Score,
-		Text:   createQuestion.Text,
-		Image:  "",
-	}
-
-	err = s.QuizRepository.CreateQuestion(question)
-	if err != nil {
-		return nil, err
-	}
-
-	return question, nil
-}
-
-func (s *QuizService) CreateOption(createOption *dto.CreateOption, userId uuid.UUID) (option *entity.Option, err error) {
-	question, err := s.QuizRepository.GetQuestion(createOption.QuestionId)
-	if err != nil {
-		return nil, err
-	}
-
-	quiz, err := s.QuizRepository.GetQuiz(question.QuizId)
-	if err != nil {
-		return nil, err
-	}
-
-	if quiz.UserId != userId {
-		return nil, &response.Forbidden
-	}
-
-	option = &entity.Option{
-		Id:         uuid.New(),
-		QuestionId: createOption.QuestionId,
-		IsCorrect:  createOption.IsCorrect,
-		Text:       createOption.Text,
-		Image:      "",
-	}
-
-	err = s.QuizRepository.CreateOption(option)
-	if err != nil {
-		return nil, err
-	}
-
-	return option, nil
+	return &quizId, nil
 }
