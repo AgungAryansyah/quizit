@@ -1,7 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-ALTER TABLE quizzes ADD COLUMN user_id UUID;
-ALTER TABLE quizzes ADD FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+ALTER TABLE quizzes ADD COLUMN quiz_code VARCHAR(6);
 -- +goose StatementEnd
 
 -- +goose Down
