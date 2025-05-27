@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchCurrentUser = async () => {
     try {
-      const response = await api.get("/users", { withCredentials: true }); 
+      const response = await api.get("/users", { withCredentials: true });
       const userData = response.data.user || response.data;
 
       if (userData && Object.keys(userData).length > 0) {
@@ -72,17 +72,19 @@ export const AuthProvider = ({ children }) => {
   const register = async (name, email, password) => {
     setLoading(true);
     try {
-      const response = await api.post("/auths/register", { name, email, password });
-      const { token, user: userData } = response.data;
-      localStorage.setItem("authToken", token);
-      localStorage.setItem("user", JSON.stringify(userData));
-      setUser(userData);
+      // Step 1: Call the backend register endpoint.
+      // This endpoint confirms registration but returns no user data or token from backend.
+      await api.post("/auths/register", { name, email, password });
+
+      // Step 2: Registration successful. Do NOT automatically log in.
+      // The user state is NOT set here by the register function.
+      // The user will be redirected to the login page.
       return { success: true };
     } catch (error) {
-      setUser(null);
+      // In case of registration API failure
       return {
         success: false,
-        error: error.response?.data?.message || "Registration failed",
+        error: error.response?.data?.message || error.message || "Registration failed.",
       };
     } finally {
       setLoading(false);
