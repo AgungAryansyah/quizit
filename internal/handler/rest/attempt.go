@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"fmt"
 	"quizit-be/model/dto"
 	"quizit-be/pkg/response"
 
@@ -22,7 +21,6 @@ func (h *Handler) CreateAttempt(ctx *fiber.Ctx) error {
 
 	attempt, err := h.service.AttemptService.CreateAttempt(answers, userId)
 	if err != nil {
-		fmt.Println(err.Error())
 		return err
 	}
 

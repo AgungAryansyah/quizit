@@ -12,7 +12,7 @@ import (
 type IQuizService interface {
 	GetAllQuizzes(page, pageSize int) (quiz *[]entity.Quiz, err error)
 	GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *dto.QuizDto, err error)
-	CreateQuiz(createQuiz *dto.CreateQuiz, userId uuid.UUID) (*uuid.UUID, error)
+	CreateQuiz(createQuiz *dto.CreateQuiz, userId uuid.UUID) (res *dto.CreateQuizRes, err error)
 }
 
 type QuizService struct {
@@ -35,7 +35,7 @@ func (s *QuizService) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *dto.
 	return s.QuizRepository.GetQuizWithQuestionAndOption(quizId)
 }
 
-func (s *QuizService) CreateQuiz(createQuiz *dto.CreateQuiz, userId uuid.UUID) (*uuid.UUID, error) {
+func (s *QuizService) CreateQuiz(createQuiz *dto.CreateQuiz, userId uuid.UUID) (res *dto.CreateQuizRes, err error) {
 	quizId := uuid.New()
 	quizCode, err := util.GenerateRandomString(6)
 	if err != nil {
@@ -90,5 +90,8 @@ func (s *QuizService) CreateQuiz(createQuiz *dto.CreateQuiz, userId uuid.UUID) (
 
 	}
 
-	return &quizId, nil
+	return &dto.CreateQuizRes{
+		Id:       quizId,
+		QuizCode: quizCode,
+	}, nil
 }
