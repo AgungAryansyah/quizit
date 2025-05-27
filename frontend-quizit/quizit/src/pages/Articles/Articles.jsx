@@ -6,60 +6,75 @@ import api from "../../config/api" // Ensure this path is correct
 import Card from "../../components/UI/Card" // Ensure this path is correct
 import Button from "../../components/UI/Button" // Ensure this path is correct
 import Input from "../../components/UI/Input" // Ensure this path is correct
-import { Search, Plus, Calendar } from "lucide-react" // User icon removed
+import { Search, Plus, Calendar, ChevronLeft, ChevronRight } from "lucide-react"
 
 const Articles = () => {
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
-  const [filteredArticles, setFilteredArticles] = useState([])
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [isLastPage, setIsLastPage] = useState(false) // To help disable 'Next' button
+  const articlesPerPage = 6;
 
+  // Debounce effect for search term
   useEffect(() => {
-    fetchArticles()
-  }, [])
+    const timerId = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+      setCurrentPage(1); // Reset to page 1 for new search
+    }, 500); // 500ms delay before triggering search
 
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [searchTerm]);
+
+  // Effect for fetching articles when debouncedSearchTerm or currentPage changes
   useEffect(() => {
-    if (!articles) return;
-    const lowerSearchTerm = searchTerm.toLowerCase();
-    const filtered = articles.filter(
-      (article) =>
-        article.title.toLowerCase().includes(lowerSearchTerm) ||
-        (article.content && article.content.toLowerCase().includes(lowerSearchTerm))
-        // Removed article.author from search as it's no longer displayed or explicitly stored with a user-friendly name
-    )
-    setFilteredArticles(filtered)
-  }, [articles, searchTerm])
+    fetchArticles(debouncedSearchTerm, currentPage);
+  }, [debouncedSearchTerm, currentPage]);
 
-  const fetchArticles = async () => {
+  const fetchArticles = async (keyword, page) => {
     setLoading(true);
     try {
-      const response = await api.get("/articles?page=1&size=9") 
+      const response = await api.get(
+        `/articles?keyword=${encodeURIComponent(keyword)}&page=${page}&size=${articlesPerPage}`
+      );
       
-      const rawArticles = response.data.payload && Array.isArray(response.data.payload) && response.data.payload.length > 0 && Array.isArray(response.data.payload[0])
-        ? response.data.payload[0]
-        : [];
+      const rawArticles = response.data.payload?.[0] || []; // Safely access nested array
 
       const formattedArticles = rawArticles.map(article => ({
         ...article,
         content: article.text || "",
-        // Author field is no longer explicitly used for display in this version
-        // author: article.user_id || "Unknown Author", 
+        // author field is not used for display
       }));
       setArticles(formattedArticles);
+      setIsLastPage(formattedArticles.length < articlesPerPage); // Heuristic for last page
     } catch (error) {
-      console.error("Error fetching articles:", error)
+      console.error("Error fetching articles:", error);
       setArticles([]);
+      setIsLastPage(true); // Assume last page on error
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  if (loading) {
+  const handlePreviousPage = () => {
+    setCurrentPage((prev) => Math.max(1, prev - 1));
+  };
+
+  const handleNextPage = () => {
+    if (!isLastPage) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  if (loading && articles.length === 0) { // Show full page loader only on initial load
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
       </div>
-    )
+    );
   }
 
   return (
@@ -85,7 +100,7 @@ const Articles = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <Input
               type="search"
-              placeholder="Search articles by title or content..." // Updated placeholder
+              placeholder="Search articles by title or content..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 w-full"
@@ -93,22 +108,26 @@ const Articles = () => {
           </div>
         </Card>
 
-        {/* Articles Grid */}
-        {filteredArticles.length > 0 ? (
+        {/* Articles Grid - Show loader overlay if loading new page/search */}
+        {loading && articles.length > 0 && (
+            <div className="text-center py-10">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 mx-auto"></div>
+                <p className="mt-2 text-gray-600">Loading articles...</p>
+            </div>
+        )}
+
+        {!loading && articles.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredArticles.map((article) => (
+            {articles.map((article) => (
               <Card key={article.id} className="flex flex-col justify-between hover:shadow-lg transition-shadow duration-200">
-                <div> {/* Content wrapper */}
+                <div>
                   <div className="mb-4">
                     <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 h-14">{article.title}</h3>
                     <p className="text-gray-600 text-sm line-clamp-3 h-16"> 
                       {article.content ? article.content.substring(0, 150) + (article.content.length > 150 ? "..." : "") : "No content preview available."}
                     </p>
                   </div>
-
-                  {/* Metadata section - Author display removed */}
                   <div className="flex items-center justify-end text-sm text-gray-500 mb-4 pt-2 border-t border-gray-100">
-                    {/* User ID display removed from here */}
                     {article.created_at && ( 
                        <div className="flex items-center space-x-1">
                         <Calendar size={16} />
@@ -117,9 +136,7 @@ const Articles = () => {
                     )}
                   </div>
                 </div>
-
                 <Link to={`/articles/${article.id}`} className="mt-auto">
-                  {/* "Read More" button now uses default variant for primary color */}
                   <Button className="w-full"> 
                     Read More
                   </Button>
@@ -128,24 +145,53 @@ const Articles = () => {
             ))}
           </div>
         ) : (
-          <Card className="text-center py-12">
-            <div className="text-gray-500">
-              {searchTerm ? (
-                <>
-                  <h3 className="text-lg font-medium mb-2">No articles found for "{searchTerm}"</h3>
-                  <p>Try adjusting your search terms.</p>
-                </>
-              ) : (
-                <>
-                  <h3 className="text-lg font-medium mb-2">No articles available</h3>
-                  <p className="mb-4">Be the first to write one!</p>
-                  <Link to="/create-article">
-                    <Button>Write First Article</Button>
-                  </Link>
-                </>
-              )}
+          !loading && ( // Only show "No articles" if not loading
+            <Card className="text-center py-12">
+              <div className="text-gray-500">
+                {debouncedSearchTerm ? (
+                  <>
+                    <h3 className="text-lg font-medium mb-2">No articles found for "{debouncedSearchTerm}"</h3>
+                    <p>Try adjusting your search terms or clear the search.</p>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="text-lg font-medium mb-2">No articles available</h3>
+                    <p className="mb-4">Be the first to write one!</p>
+                    <Link to="/create-article">
+                      <Button>Write First Article</Button>
+                    </Link>
+                  </>
+                )}
+              </div>
+            </Card>
+          )
+        )}
+
+        {/* Pagination Controls */}
+        {!loading && (articles.length > 0 || currentPage > 1) && ( // Show pagination if there are articles or if not on page 1 (to allow going back)
+            <div className="mt-12 flex justify-center items-center space-x-4">
+                <Button
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1 || loading}
+                    variant="outline"
+                    className="flex items-center"
+                >
+                    <ChevronLeft size={20} className="mr-1" />
+                    Previous
+                </Button>
+                <span className="text-gray-700 font-medium">
+                    Page {currentPage}
+                </span>
+                <Button
+                    onClick={handleNextPage}
+                    disabled={isLastPage || loading}
+                    variant="outline"
+                    className="flex items-center"
+                >
+                    Next
+                    <ChevronRight size={20} className="ml-1" />
+                </Button>
             </div>
-          </Card>
         )}
       </div>
     </div>
