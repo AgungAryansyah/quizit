@@ -28,6 +28,7 @@ func (r *Route) RegisterRoutes(port string) error {
 	mountQuiz(routerGroup, r.handler, r.middleware)
 	mountAttempt(routerGroup, r.handler, r.middleware)
 	mountUser(routerGroup, r.handler, r.middleware)
+	mountArtice(routerGroup, r.handler, r.middleware)
 
 	return r.app.Listen(":" + port)
 }
@@ -63,4 +64,11 @@ func mountUser(routerGroup fiber.Router, handler rest.Handler, middleware middle
 	user := routerGroup.Group("/users")
 
 	user.Get("/", middleware.Authentication, handler.GetMe)
+}
+
+func mountArtice(routerGroup fiber.Router, handler rest.Handler, middleware middleware.IMiddleware) {
+	article := routerGroup.Group("/articles")
+
+	article.Get("/:id", middleware.Authentication, handler.GetArticle)
+	article.Get("/", middleware.Authentication, handler.GetArticles)
 }
