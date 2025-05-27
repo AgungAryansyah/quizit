@@ -13,6 +13,7 @@ import (
 type IArticleRepository interface {
 	GetArticle(articleId uuid.UUID) (article *entity.Article, err error)
 	GetArticles(page, pageSize int) (articles *[]entity.Article, err error)
+	CreateArticle(article *entity.Article) error
 }
 
 type ArticleRepository struct {
@@ -61,4 +62,13 @@ func (r *ArticleRepository) GetArticles(page, pageSize int) (articles *[]entity.
 	}
 
 	return articles, err
+}
+
+func (r *ArticleRepository) CreateArticle(article *entity.Article) error {
+	query := `
+		INSERT INTO articles (id, user_id, title, text)
+		VALUES ($1, $2, $3, $4)
+	`
+	_, err := r.db.Exec(query, article.Id, article.UserId, article.Title, article.Text)
+	return err
 }

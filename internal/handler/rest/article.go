@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"quizit-be/model/dto"
 	"quizit-be/pkg/response"
 
 	"github.com/gofiber/fiber/v2"
@@ -31,4 +32,23 @@ func (h *Handler) GetArticles(ctx *fiber.Ctx) error {
 	}
 
 	return response.HttpSuccess(ctx, "success", articles)
+}
+
+func (h *Handler) CreateArticle(ctx *fiber.Ctx) error {
+	var create dto.CreateArticle
+	if err := ctx.BodyParser(&create); err != nil {
+		return &response.Unauthorized
+	}
+
+	userId, ok := ctx.Locals("userId").(uuid.UUID)
+	if !ok {
+		return &response.Unauthorized
+	}
+
+	articleId, err := h.service.ArticleServie.CreateArticle(&create, userId)
+	if err != nil {
+		return err
+	}
+
+	return response.HttpSuccess(ctx, "success", articleId)
 }
