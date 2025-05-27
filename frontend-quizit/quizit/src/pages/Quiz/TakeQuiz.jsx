@@ -1,3 +1,4 @@
+// src/pages/Quiz/TakeQuiz.jsx
 "use client"
 
 import { useState, useEffect } from "react"
@@ -10,127 +11,144 @@ const TakeQuiz = () => {
   const { quizId } = useParams()
   const navigate = useNavigate()
   const [quiz, setQuiz] = useState(null)
-  const [currentQuestion, setCurrentQuestion] = useState(0)
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState({})
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
-  const [showResults, setShowResults] = useState(false)
-  const [results, setResults] = useState(null)
+  // Removed showResults and results state, as we navigate to a new page
+  // const [showResults, setShowResults] = useState(false) 
+  // const [results, setResults] = useState(null)
 
   useEffect(() => {
-    fetchQuiz()
-  }, [quizId])
+    fetchQuizDetails();
+  }, [quizId]);
 
-  const fetchQuiz = async () => {
+  const fetchQuizDetails = async () => {
+    setLoading(true);
     try {
-      const response = await api.get(`/quizzes/${quizId}`)
-      setQuiz(response.data)
+      const response = await api.get(`/quizzes/${quizId}/questions/options`);
+      if (response.data && response.data.payload && Array.isArray(response.data.payload) && response.data.payload.length > 0) {
+        setQuiz(response.data.payload[0]);
+      } else {
+        throw new Error("Quiz data not found or in unexpected format.");
+      }
     } catch (error) {
-      console.error("Error fetching quiz:", error)
-      navigate("/join-quiz")
+      console.error("Error fetching quiz details:", error);
+      navigate("/join-quiz", { state: { error: "Failed to load quiz." } });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const handleAnswerSelect = (questionIndex, answerIndex) => {
-    setAnswers({
-      ...answers,
-      [questionIndex]: answerIndex,
-    })
-  }
+  const handleAnswerSelect = (questionId, optionId) => {
+    setAnswers(prevAnswers => ({
+      ...prevAnswers,
+      [questionId]: optionId,
+    }));
+  };
 
   const handleNext = () => {
-    if (currentQuestion < quiz.questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1)
+    if (quiz && currentQuestionIndex < quiz.questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
-  }
+  };
 
   const handlePrevious = () => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1)
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
-  }
+  };
 
-  const handleSubmit = async () => {
-    setSubmitting(true)
+  const handleSubmitQuiz = async () => {
+    setSubmitting(true);
+    const payload = {
+      quiz_id: quizId, 
+      answers: answers, 
+    };
 
     try {
-      const response = await api.post(`/quizzes/${quizId}/submit`, {
-        answers: answers,
-      })
-      setResults(response.data)
-      setShowResults(true)
+      const response = await api.post(`/attempts`, payload);
+      if (response.data && response.data.payload && Array.isArray(response.data.payload) && response.data.payload.length > 0) {
+        const attemptResult = response.data.payload[0];
+        // Navigate to the new QuizResults page with necessary data
+        navigate(`/quiz/${quizId}/results`, { 
+          state: { 
+            results: attemptResult,
+            quizTitle: quiz?.title || "Quiz", // Pass the quiz title
+            totalQuestions: quiz?.questions?.length || 0 // Pass total number of questions
+          } 
+        });
+      } else {
+        throw new Error("Invalid response structure after submitting quiz.");
+      }
+      // No longer setting local state for results or showing them here
+      // setShowResults(true); 
     } catch (error) {
-      console.error("Error submitting quiz:", error)
-      alert("Failed to submit quiz. Please try again.")
+      console.error("Error submitting quiz:", error);
+      alert(error.response?.data?.message || error.message || "Failed to submit quiz. Please try again.");
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
+
+  // The results display section previously here is now removed,
+  // as we navigate to QuizResults.jsx
 
   if (loading) {
+    // ... (loading JSX remains the same)
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
       </div>
-    )
+    );
   }
 
   if (!quiz) {
+    // ... (quiz not found JSX remains the same)
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card>
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Quiz Not Found</h2>
+            <p className="text-gray-600 mb-4">The quiz you are looking for could not be loaded.</p>
             <Button onClick={() => navigate("/join-quiz")}>Back to Join Quiz</Button>
           </div>
         </Card>
       </div>
-    )
+    );
   }
-
-  if (showResults) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Card className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Quiz Complete!</h2>
-            <div className="mb-6">
-              <div className="text-6xl font-bold text-primary-600 mb-2">{results?.score || 0}%</div>
-              <p className="text-gray-600">
-                You got {results?.correct_answers || 0} out of {quiz.questions.length} questions correct
-              </p>
-            </div>
-            <div className="space-y-4">
-              <Button onClick={() => navigate("/dashboard")}>Back to Dashboard</Button>
-              <Button variant="outline" onClick={() => navigate("/join-quiz")}>
-                Take Another Quiz
-              </Button>
-            </div>
-          </Card>
-        </div>
+  
+  if (!quiz.questions || quiz.questions.length === 0) {
+    // ... (empty quiz JSX remains the same)
+     return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card>
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Empty Quiz</h2>
+            <p className="text-gray-600 mb-4">This quiz does not have any questions.</p>
+            <Button onClick={() => navigate("/join-quiz")}>Back to Join Quiz</Button>
+          </div>
+        </Card>
       </div>
-    )
+    );
   }
 
-  const question = quiz.questions[currentQuestion]
-  const progress = ((currentQuestion + 1) / quiz.questions.length) * 100
+  // ... (rest of the quiz taking JSX: currentQuestionData, progress, rendering question, options, and nav buttons) ...
+  // This part remains the same as before
+  const currentQuestionData = quiz.questions[currentQuestionIndex];
+  const progress = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900">{quiz.title}</h1>
-          <p className="text-gray-600">{quiz.description}</p>
         </div>
 
-        {/* Progress Bar */}
         <div className="mb-6">
           <div className="flex justify-between text-sm text-gray-600 mb-2">
             <span>
-              Question {currentQuestion + 1} of {quiz.questions.length}
+              Question {currentQuestionIndex + 1} of {quiz.questions.length}
             </span>
             <span>{Math.round(progress)}% Complete</span>
           </div>
@@ -142,61 +160,61 @@ const TakeQuiz = () => {
           </div>
         </div>
 
-        {/* Question */}
         <Card className="mb-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">{question.question}</h2>
-
+          <h2 className="text-xl font-bold text-gray-900 mb-6">{currentQuestionData.text}</h2>
+          
           <div className="space-y-3">
-            {question.options.map((option, index) => (
+            {currentQuestionData.options.map((option) => (
               <button
-                key={index}
-                onClick={() => handleAnswerSelect(currentQuestion, index)}
+                key={option.id}
+                onClick={() => handleAnswerSelect(currentQuestionData.id, option.id)}
                 className={`w-full p-4 text-left border rounded-lg transition-colors ${
-                  answers[currentQuestion] === index
-                    ? "border-primary-500 bg-primary-50 text-primary-700"
+                  answers[currentQuestionData.id] === option.id
+                    ? "border-primary-500 bg-primary-50 text-primary-700 ring-2 ring-primary-500"
                     : "border-gray-300 hover:border-gray-400"
                 }`}
               >
                 <div className="flex items-center space-x-3">
                   <div
-                    className={`w-4 h-4 rounded-full border-2 ${
-                      answers[currentQuestion] === index ? "border-primary-500 bg-primary-500" : "border-gray-300"
+                    className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
+                      answers[currentQuestionData.id] === option.id 
+                        ? "border-primary-600 bg-primary-600" 
+                        : "border-gray-400"
                     }`}
                   >
-                    {answers[currentQuestion] === index && (
-                      <div className="w-full h-full rounded-full bg-white scale-50"></div>
+                    {answers[currentQuestionData.id] === option.id && (
+                      <div className="w-2 h-2 rounded-full bg-white"></div>
                     )}
                   </div>
-                  <span className="font-medium">{option}</span>
+                  <span className="font-medium">{option.text}</span>
                 </div>
               </button>
             ))}
           </div>
         </Card>
 
-        {/* Navigation */}
         <div className="flex justify-between">
-          <Button variant="outline" onClick={handlePrevious} disabled={currentQuestion === 0}>
+          <Button variant="outline" onClick={handlePrevious} disabled={currentQuestionIndex === 0}>
             Previous
           </Button>
 
-          {currentQuestion === quiz.questions.length - 1 ? (
+          {currentQuestionIndex === quiz.questions.length - 1 ? (
             <Button
-              onClick={handleSubmit}
+              onClick={handleSubmitQuiz}
               loading={submitting}
-              disabled={submitting || answers[currentQuestion] === undefined}
+              disabled={submitting || answers[currentQuestionData.id] === undefined}
             >
               Submit Quiz
             </Button>
           ) : (
-            <Button onClick={handleNext} disabled={answers[currentQuestion] === undefined}>
+            <Button onClick={handleNext} disabled={answers[currentQuestionData.id] === undefined}>
               Next
             </Button>
           )}
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default TakeQuiz
+export default TakeQuiz;
