@@ -4,6 +4,7 @@ import (
 	"quizit-be/internal/repository"
 	"quizit-be/model/dto"
 	"quizit-be/model/entity"
+	"quizit-be/pkg/util"
 
 	"github.com/google/uuid"
 )
@@ -36,14 +37,20 @@ func (s *QuizService) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *dto.
 
 func (s *QuizService) CreateQuiz(createQuiz *dto.CreateQuiz, userId uuid.UUID) (*uuid.UUID, error) {
 	quizId := uuid.New()
-	quiz := &entity.Quiz{
-		Id:     quizId,
-		Theme:  createQuiz.Theme,
-		Title:  createQuiz.Title,
-		UserId: userId,
+	quizCode, err := util.GenerateRandomString(6)
+	if err != nil {
+		return nil, err
 	}
 
-	err := s.QuizRepository.CreateQuiz(quiz)
+	quiz := &entity.Quiz{
+		Id:       quizId,
+		Theme:    createQuiz.Theme,
+		Title:    createQuiz.Title,
+		UserId:   userId,
+		QuizCode: quizCode,
+	}
+
+	err = s.QuizRepository.CreateQuiz(quiz)
 	if err != nil {
 		return nil, err
 	}

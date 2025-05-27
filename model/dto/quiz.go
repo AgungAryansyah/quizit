@@ -19,6 +19,7 @@ type QuizDto struct {
 	Theme     string        `json:"theme" db:"theme"`
 	Title     string        `json:"title" db:"title"`
 	UserId    uuid.UUID     `json:"user_id" db:"user_id"`
+	QuizCode  string        `json:"quiz_code" db:"quiz_code"`
 	Questions []QuestionDto `json:"questions" db:"questions"`
 }
 

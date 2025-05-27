@@ -5,20 +5,19 @@ import (
 )
 
 type Quiz struct {
-	Id        uuid.UUID  `json:"id" db:"id"`
-	Theme     string     `json:"theme" db:"theme"`
-	Title     string     `json:"title" db:"title"`
-	UserId    uuid.UUID  `json:"user_id" db:"user_id"`
-	Questions []Question `json:"questions" db:"questions"`
+	Id       uuid.UUID `json:"id" db:"id"`
+	Theme    string    `json:"theme" db:"theme"`
+	Title    string    `json:"title" db:"title"`
+	UserId   uuid.UUID `json:"user_id" db:"user_id"`
+	QuizCode string    `json:"quiz_code" db:"quiz_code"`
 }
 
 type Question struct {
-	Id      uuid.UUID `json:"id" db:"id"`
-	QuizId  uuid.UUID `json:"quiz_id" db:"quiz_id"`
-	Score   int       `json:"score" db:"score"`
-	Text    string    `json:"text" db:"text"`
-	Image   string    `json:"image" db:"image"`
-	Options []Option  `json:"options" db:"options"`
+	Id     uuid.UUID `json:"id" db:"id"`
+	QuizId uuid.UUID `json:"quiz_id" db:"quiz_id"`
+	Score  int       `json:"score" db:"score"`
+	Text   string    `json:"text" db:"text"`
+	Image  string    `json:"image" db:"image"`
 }
 
 type Option struct {
