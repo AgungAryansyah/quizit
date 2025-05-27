@@ -9,6 +9,7 @@ import Register from "./pages/Auth/Register";
 import CreateQuiz from "./pages/Quiz/CreateQuiz";
 import JoinQuiz from "./pages/Quiz/JoinQuiz";
 import TakeQuiz from "./pages/Quiz/TakeQuiz";
+import QuizResults from "./pages/Quiz/QuizResults";
 import Articles from "./pages/Articles/Articles";
 import ArticleDetail from "./pages/Articles/ArticleDetail";
 import CreateArticle from "./pages/Articles/CreateArticle";
@@ -33,6 +34,7 @@ function App() {
             <Route path="/create-quiz" element={<CreateQuiz />} />
             <Route path="/join-quiz" element={<JoinQuiz />} />
             <Route path="/quiz/:quizId" element={<TakeQuiz />} />
+            <Route path="/quiz/:quizId/results" element={<QuizResults />} /> {/* New route for results */}
             <Route path="/articles" element={<Articles />} />
             <Route path="/articles/:articleId" element={<ArticleDetail />} />
             <Route path="/create-article" element={<CreateArticle />} />
