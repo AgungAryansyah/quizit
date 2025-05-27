@@ -5,7 +5,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import api from "../../config/api" // Ensure this path is correct
 import Card from "../../components/UI/Card" // Ensure this path is correct
 import Button from "../../components/UI/Button" // Ensure this path is correct
-import { ArrowLeft, Calendar } from "lucide-react" // User icon removed
+import { ArrowLeft, Calendar, User } from "lucide-react" // Re-added User icon
 
 const ArticleDetail = () => {
   const { articleId } = useParams()
@@ -14,30 +14,27 @@ const ArticleDetail = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchArticleDetails() // Renamed for clarity
+    fetchArticleDetails()
   }, [articleId])
 
   const fetchArticleDetails = async () => {
-    setLoading(true); // Ensure loading is true at the start
+    setLoading(true);
     try {
       const response = await api.get(`/articles/${articleId}`)
-      // Backend response: { message: "success", payload: [{ articleObject }] }
+      // Backend response example: { message: "success", payload: [{ user_name: "agung", title: "...", text: "..." }] }
       if (response.data && response.data.payload && Array.isArray(response.data.payload) && response.data.payload.length > 0) {
         const rawArticle = response.data.payload[0];
         setArticle({
-          ...rawArticle,
+          ...rawArticle, // This will include user_name, title, text, id, created_at (if sent by backend)
           content: rawArticle.text || "", // Map backend 'text' to frontend 'content'
-          // 'author' field is not directly available as a name, so we won't set it for display here
         });
       } else {
         console.error("Article data not found in expected format:", response.data);
-        setArticle(null); // Set article to null if not found or format is wrong
+        setArticle(null);
       }
     } catch (error) {
       console.error("Error fetching article:", error)
-      setArticle(null); // Ensure article is null on error
-      // Optionally navigate or show a more specific error message to the user
-      // For now, the !article check below will handle showing "Article Not Found"
+      setArticle(null);
     } finally {
       setLoading(false)
     }
@@ -80,13 +77,19 @@ const ArticleDetail = () => {
 
         {/* Article */}
         <Card>
-          <div className="mb-6 pb-4 border-b border-gray-200"> {/* Added padding and border */}
+          <div className="mb-6 pb-4 border-b border-gray-200">
             <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">{article.title}</h1>
 
-            {/* Metadata - Author display removed */}
-            <div className="flex items-center space-x-6 text-sm text-gray-500">
-              {/* User/Author display removed */}
-              {article.created_at && ( // Conditionally render if created_at exists
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-500"> {/* Added flex-wrap and gap-y for responsiveness */}
+              {/* Display Author Username if available */}
+              {article.user_name && (
+                <div className="flex items-center space-x-1">
+                  <User size={16} />
+                  <span>By {article.user_name}</span>
+                </div>
+              )}
+              {/* Display Published Date if available */}
+              {article.created_at && (
                 <div className="flex items-center space-x-1">
                   <Calendar size={16} />
                   <span>Published on {new Date(article.created_at).toLocaleDateString()}</span>
@@ -96,12 +99,9 @@ const ArticleDetail = () => {
           </div>
 
           {/* Article Content */}
-          <div className="prose max-w-none prose-lg"> {/* Added prose-lg for better readability */}
-            {/* Using mapped 'content' (from backend 'text') */}
+          <div className="prose max-w-none prose-lg">
             <div 
-              className="whitespace-pre-wrap text-gray-800 leading-relaxed" 
-              // If content is HTML, use dangerouslySetInnerHTML (with caution and sanitization)
-              // For plain text that needs line breaks preserved:
+              className="whitespace-pre-wrap text-gray-800 leading-relaxed"
             >
               {article.content || "No content available."}
             </div>
