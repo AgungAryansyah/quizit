@@ -20,6 +20,7 @@ type IQuizRepository interface {
 	CreateQuiz(quiz *entity.Quiz) error
 	CreateQuestion(question *entity.Question) error
 	CreateOption(option *entity.Option) error
+	GetQuizByCode(quizCode string) (quiz *entity.Quiz, err error)
 }
 
 type QuizRepository struct {
@@ -172,4 +173,18 @@ func (r *QuizRepository) CreateOption(option *entity.Option) error {
 	`
 	_, err := r.db.Exec(query, option.Id, option.QuestionId, option.IsCorrect, option.Text, option.Image)
 	return err
+}
+
+func (r *QuizRepository) GetQuizByCode(quizCode string) (quiz *entity.Quiz, err error) {
+	quiz = &entity.Quiz{}
+	query := `SELECT * FROM quizzes WHERE quiz_code = $1`
+	err = r.db.Get(quiz, query, quizCode)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, &response.QuizNotFound
+		}
+		return nil, err
+	}
+
+	return quiz, nil
 }

@@ -4,6 +4,7 @@ import (
 	"quizit-be/internal/repository"
 	"quizit-be/model/dto"
 	"quizit-be/model/entity"
+	"quizit-be/pkg/response"
 	"time"
 
 	"github.com/google/uuid"
@@ -30,6 +31,11 @@ func NewAttemptService(AttemptRepository repository.IAttemptRepository, QuizRepo
 func (s *AttemptService) CreateAttempt(answers dto.UserAnswersDto, userId uuid.UUID) (attempt *entity.Attempt, err error) {
 	var score int
 
+	quiz, err := s.QuizRepository.GetQuizByCode(answers.QuizCode)
+	if err != nil {
+		return nil, err
+	}
+
 	for questionId, answerId := range answers.Answers {
 		correct, err := s.QuizRepository.IsCorrect(answerId)
 		if err != nil {
@@ -42,6 +48,10 @@ func (s *AttemptService) CreateAttempt(answers dto.UserAnswersDto, userId uuid.U
 				return nil, err
 			}
 
+			if question.QuizId != quiz.Id {
+				return nil, &response.BadRequest
+			}
+
 			score += question.Score
 		}
 	}
@@ -49,7 +59,7 @@ func (s *AttemptService) CreateAttempt(answers dto.UserAnswersDto, userId uuid.U
 	attempt = &entity.Attempt{
 		Id:           uuid.New(),
 		UserId:       userId,
-		QuizId:       answers.QuizId,
+		QuizId:       quiz.Id,
 		TotalScore:   score,
 		FinishedTime: time.Now(),
 	}
