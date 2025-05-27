@@ -19,6 +19,6 @@ func NewService(repository *repository.Repository, jwt *jwt.IJWT) *Service {
 		UserService:    NewUserService(repository.UserRepository),
 		QuizService:    NewQuizService(repository.QuizRepository, repository.UserRepository),
 		AttemptService: NewAttemptService(repository.AttemptRepository, repository.QuizRepository),
-		ArticleServie:  NewArticleServie(repository.ArticleRepository),
+		ArticleServie:  NewArticleServie(repository.ArticleRepository, repository.UserRepository),
 	}
 }
