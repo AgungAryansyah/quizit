@@ -39,18 +39,18 @@ type OptionDto struct {
 }
 
 type CreateQuiz struct {
-	Theme string `json:"theme"`
-	Title string `json:"title"`
+	Theme     string                      `json:"theme"`
+	Title     string                      `json:"title"`
+	Questions []CreateQuestionWithOptions `json:"questions"`
 }
 
-type CreateQuestion struct {
-	QuizId uuid.UUID `json:"quiz_id" db:"quiz_id"`
-	Score  int       `json:"score" db:"score"`
-	Text   string    `json:"text" db:"text"`
+type CreateQuestionWithOptions struct {
+	Score   int            `json:"score"`
+	Text    string         `json:"text"`
+	Options []CreateOption `json:"options"`
 }
 
 type CreateOption struct {
-	QuestionId uuid.UUID `json:"question_id" db:"question_id"`
-	IsCorrect  bool      `json:"is_correct" db:"is_correct"`
-	Text       string    `json:"text" db:"text"`
+	IsCorrect bool   `json:"is_correct"`
+	Text      string `json:"text"`
 }
