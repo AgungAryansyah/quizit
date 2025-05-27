@@ -23,8 +23,8 @@ const Dashboard = () => {
     try {
       // Removed api.get("/dashboard/stats") from Promise.all
       const [quizzesRes, articlesRes] = await Promise.all([
-        api.get("/quizzes?limit=5"),
-        api.get("/articles?limit=5"),
+        api.get("/quizzes?size=5"),
+        api.get("/articles?size=5"),
       ])
 
       // setStats(statsRes.data) removed

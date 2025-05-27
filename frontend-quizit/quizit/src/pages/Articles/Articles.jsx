@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import api from "../../config/api"
-import Card from "../../components/UI/Card"
-import Button from "../../components/UI/Button"
-import Input from "../../components/UI/Input"
-import { Search, Plus, Calendar, User } from "lucide-react"
+import api from "../../config/api" // Ensure this path is correct
+import Card from "../../components/UI/Card" // Ensure this path is correct
+import Button from "../../components/UI/Button" // Ensure this path is correct
+import Input from "../../components/UI/Input" // Ensure this path is correct
+import { Search, Plus, Calendar } from "lucide-react" // User icon removed
 
 const Articles = () => {
   const [articles, setArticles] = useState([])
@@ -19,21 +19,36 @@ const Articles = () => {
   }, [])
 
   useEffect(() => {
+    if (!articles) return;
+    const lowerSearchTerm = searchTerm.toLowerCase();
     const filtered = articles.filter(
       (article) =>
-        article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        article.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        article.author.toLowerCase().includes(searchTerm.toLowerCase()),
+        article.title.toLowerCase().includes(lowerSearchTerm) ||
+        (article.content && article.content.toLowerCase().includes(lowerSearchTerm))
+        // Removed article.author from search as it's no longer displayed or explicitly stored with a user-friendly name
     )
     setFilteredArticles(filtered)
   }, [articles, searchTerm])
 
   const fetchArticles = async () => {
+    setLoading(true);
     try {
-      const response = await api.get("/articles")
-      setArticles(response.data.articles || [])
+      const response = await api.get("/articles?page=1&size=9") 
+      
+      const rawArticles = response.data.payload && Array.isArray(response.data.payload) && response.data.payload.length > 0 && Array.isArray(response.data.payload[0])
+        ? response.data.payload[0]
+        : [];
+
+      const formattedArticles = rawArticles.map(article => ({
+        ...article,
+        content: article.text || "",
+        // Author field is no longer explicitly used for display in this version
+        // author: article.user_id || "Unknown Author", 
+      }));
+      setArticles(formattedArticles);
     } catch (error) {
       console.error("Error fetching articles:", error)
+      setArticles([]);
     } finally {
       setLoading(false)
     }
@@ -69,10 +84,11 @@ const Articles = () => {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <Input
-              placeholder="Search articles..."
+              type="search"
+              placeholder="Search articles by title or content..." // Updated placeholder
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 w-full"
             />
           </div>
         </Card>
@@ -81,25 +97,30 @@ const Articles = () => {
         {filteredArticles.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredArticles.map((article) => (
-              <Card key={article.id} className="hover:shadow-lg transition-shadow duration-200">
-                <div className="mb-4">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{article.title}</h3>
-                  <p className="text-gray-600 text-sm line-clamp-3">{article.content.substring(0, 150)}...</p>
+              <Card key={article.id} className="flex flex-col justify-between hover:shadow-lg transition-shadow duration-200">
+                <div> {/* Content wrapper */}
+                  <div className="mb-4">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 h-14">{article.title}</h3>
+                    <p className="text-gray-600 text-sm line-clamp-3 h-16"> 
+                      {article.content ? article.content.substring(0, 150) + (article.content.length > 150 ? "..." : "") : "No content preview available."}
+                    </p>
+                  </div>
+
+                  {/* Metadata section - Author display removed */}
+                  <div className="flex items-center justify-end text-sm text-gray-500 mb-4 pt-2 border-t border-gray-100">
+                    {/* User ID display removed from here */}
+                    {article.created_at && ( 
+                       <div className="flex items-center space-x-1">
+                        <Calendar size={16} />
+                        <span>{new Date(article.created_at).toLocaleDateString()}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                  <div className="flex items-center space-x-1">
-                    <User size={16} />
-                    <span>{article.author}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Calendar size={16} />
-                    <span>{new Date(article.created_at).toLocaleDateString()}</span>
-                  </div>
-                </div>
-
-                <Link to={`/articles/${article.id}`}>
-                  <Button variant="outline" className="w-full">
+                <Link to={`/articles/${article.id}`} className="mt-auto">
+                  {/* "Read More" button now uses default variant for primary color */}
+                  <Button className="w-full"> 
                     Read More
                   </Button>
                 </Link>
@@ -111,13 +132,13 @@ const Articles = () => {
             <div className="text-gray-500">
               {searchTerm ? (
                 <>
-                  <h3 className="text-lg font-medium mb-2">No articles found</h3>
-                  <p>Try adjusting your search terms</p>
+                  <h3 className="text-lg font-medium mb-2">No articles found for "{searchTerm}"</h3>
+                  <p>Try adjusting your search terms.</p>
                 </>
               ) : (
                 <>
                   <h3 className="text-lg font-medium mb-2">No articles available</h3>
-                  <p className="mb-4">Be the first to write an article!</p>
+                  <p className="mb-4">Be the first to write one!</p>
                   <Link to="/create-article">
                     <Button>Write First Article</Button>
                   </Link>
