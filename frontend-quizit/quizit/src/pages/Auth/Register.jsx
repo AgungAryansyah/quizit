@@ -1,8 +1,9 @@
+// src/pages/Auth/Register.jsx
 "use client"
 
 import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { useAuth } from "../../contexts/AuthContext"
+import { Link, useNavigate } from "react-router-dom" // Ensure useNavigate is imported
+import { useAuth } from "../../contexts/AuthContext" // Ensure correct path
 import Button from "../../components/UI/Button"
 import Input from "../../components/UI/Input"
 import Card from "../../components/UI/Card"
@@ -25,7 +26,6 @@ const Register = () => {
       ...formData,
       [e.target.name]: e.target.value,
     })
-    // Clear error when user starts typing
     if (errors[e.target.name]) {
       setErrors({
         ...errors,
@@ -36,29 +36,24 @@ const Register = () => {
 
   const validateForm = () => {
     const newErrors = {}
-
     if (!formData.name) {
       newErrors.name = "Name is required"
     }
-
     if (!formData.email) {
       newErrors.email = "Email is required"
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Email is invalid"
     }
-
     if (!formData.password) {
       newErrors.password = "Password is required"
     } else if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters"
     }
-
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = "Please confirm your password"
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match"
     }
-
     return newErrors
   }
 
@@ -75,7 +70,10 @@ const Register = () => {
     const result = await register(formData.name, formData.email, formData.password)
 
     if (result.success) {
-      navigate("/dashboard")
+      // Redirect to the login page with an optional success message
+      navigate("/login", { 
+        state: { message: "Registration successful! Please log in." } 
+      });
     } else {
       setErrors({ general: result.error })
     }
@@ -95,7 +93,6 @@ const Register = () => {
             {errors.general && (
               <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">{errors.general}</div>
             )}
-
             <Input
               label="Full Name"
               type="text"
@@ -105,7 +102,6 @@ const Register = () => {
               error={errors.name}
               placeholder="Enter your full name"
             />
-
             <Input
               label="Email Address"
               type="email"
@@ -115,7 +111,6 @@ const Register = () => {
               error={errors.email}
               placeholder="Enter your email"
             />
-
             <Input
               label="Password"
               type="password"
@@ -125,7 +120,6 @@ const Register = () => {
               error={errors.password}
               placeholder="Create a password"
             />
-
             <Input
               label="Confirm Password"
               type="password"
@@ -135,7 +129,6 @@ const Register = () => {
               error={errors.confirmPassword}
               placeholder="Confirm your password"
             />
-
             <Button type="submit" className="w-full" loading={loading} disabled={loading}>
               Create Account
             </Button>

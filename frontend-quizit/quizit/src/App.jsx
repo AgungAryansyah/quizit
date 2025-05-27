@@ -1,88 +1,50 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
-import Layout from "./components/Layout/Layout"
-import Home from "./pages/Home"
-import Login from "./pages/Auth/Login"
-import Register from "./pages/Auth/Register"
-import CreateQuiz from "./pages/Quiz/CreateQuiz"
-import JoinQuiz from "./pages/Quiz/JoinQuiz"
-import TakeQuiz from "./pages/Quiz/TakeQuiz"
-import Articles from "./pages/Articles/Articles"
-import ArticleDetail from "./pages/Articles/ArticleDetail"
-import CreateArticle from "./pages/Articles/CreateArticle"
-import Dashboard from "./pages/Dashboard"
-import ProtectedRoute from "./components/Auth/ProtectedRoute"
+// App.jsx
+"use client" // Keep this if you are using Next.js App Router and this is a Client Component
+
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout/Layout"; // Ensure Layout has <Outlet />
+import Home from "./pages/Home";
+import Login from "./pages/Auth/Login";
+import Register from "./pages/Auth/Register";
+import CreateQuiz from "./pages/Quiz/CreateQuiz";
+import JoinQuiz from "./pages/Quiz/JoinQuiz";
+import TakeQuiz from "./pages/Quiz/TakeQuiz";
+import Articles from "./pages/Articles/Articles";
+import ArticleDetail from "./pages/Articles/ArticleDetail";
+import CreateArticle from "./pages/Articles/CreateArticle";
+import Dashboard from "./pages/Dashboard";
+import ProtectedRoute from "./components/Auth/ProtectedRoute"; // Using the version above
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Wrap all routes inside Layout */}
+        {/* Layout wraps all routes and should contain an <Outlet /> */}
         <Route element={<Layout />}>
+          {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Protected Routes */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/create-quiz"
-            element={
-              <ProtectedRoute>
-                <CreateQuiz />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/join-quiz"
-            element={
-              <ProtectedRoute>
-                <JoinQuiz />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/quiz/:quizId"
-            element={
-              <ProtectedRoute>
-                <TakeQuiz />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/articles"
-            element={
-              <ProtectedRoute>
-                <Articles />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/articles/:articleId"
-            element={
-              <ProtectedRoute>
-                <ArticleDetail />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/create-article"
-            element={
-              <ProtectedRoute>
-                <CreateArticle />
-              </ProtectedRoute>
-            }
-          />
+          {/* Protected Routes Grouped */}
+          {/* ProtectedRoute now acts as a layout for authenticated routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/create-quiz" element={<CreateQuiz />} />
+            <Route path="/join-quiz" element={<JoinQuiz />} />
+            <Route path="/quiz/:quizId" element={<TakeQuiz />} />
+            <Route path="/articles" element={<Articles />} />
+            <Route path="/articles/:articleId" element={<ArticleDetail />} />
+            <Route path="/create-article" element={<CreateArticle />} />
+            {/* Add any other routes that need protection here */}
+          </Route>
+
+          {/* You can add a 404 Not Found route here if needed */}
+          {/* <Route path="*" element={<NotFoundPage />} /> */}
         </Route>
       </Routes>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;
