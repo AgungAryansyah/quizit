@@ -21,7 +21,8 @@ export const AuthProvider = ({ children }) => {
   const fetchCurrentUser = async () => {
     try {
       const response = await api.get("/users", { withCredentials: true });
-      const userData = response.data.user || response.data;
+      // *** IMPORTANT: Adjust based on your actual /users response structure ***
+      const userData = response.data.user || response.data; 
 
       if (userData && Object.keys(userData).length > 0) {
         setUser(userData);
@@ -40,12 +41,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    // THIS IS THE KEY CHANGE: We now call fetchCurrentUser on initial load/refresh
     const initializeAuth = async () => {
-      await fetchCurrentUser();
-      setLoading(false);
+      await fetchCurrentUser(); // Attempt to fetch user based on cookie
+      setLoading(false);    // Set loading to false after the attempt
     };
     initializeAuth();
-  }, []);
+  }, []); // Empty dependency array: runs once on mount
 
   const login = async (email, password) => {
     setLoading(true);
@@ -53,7 +55,7 @@ export const AuthProvider = ({ children }) => {
       await api.post("/auths/login", { email, password }, {
         withCredentials: true,
       });
-      const loggedInUser = await fetchCurrentUser();
+      const loggedInUser = await fetchCurrentUser(); 
       if (!loggedInUser) {
         throw new Error("Login succeeded but failed to fetch user details from /users.");
       }
@@ -72,16 +74,9 @@ export const AuthProvider = ({ children }) => {
   const register = async (name, email, password) => {
     setLoading(true);
     try {
-      // Step 1: Call the backend register endpoint.
-      // This endpoint confirms registration but returns no user data or token from backend.
       await api.post("/auths/register", { name, email, password });
-
-      // Step 2: Registration successful. Do NOT automatically log in.
-      // The user state is NOT set here by the register function.
-      // The user will be redirected to the login page.
-      return { success: true };
+      return { success: true }; // User will be redirected to login page
     } catch (error) {
-      // In case of registration API failure
       return {
         success: false,
         error: error.response?.data?.message || error.message || "Registration failed.",
@@ -96,7 +91,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await api.post("/auths/logout", {}, { withCredentials: true });
     } catch (error) {
-      // Still proceed with client-side cleanup
+      // Log or handle backend logout error, but proceed with client-side cleanup
     } finally {
       localStorage.removeItem("authToken");
       localStorage.removeItem("user");
