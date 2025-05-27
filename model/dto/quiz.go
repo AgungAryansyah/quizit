@@ -8,12 +8,6 @@ type QuizParam struct {
 	QuizId uuid.UUID `json:"quiz_id" validate:"required,uuid"`
 }
 
-type CreateAttempt struct {
-	UserId     uuid.UUID `json:"user_id" validate:"required,uuid"`
-	QuizId     uuid.UUID `json:"quiz_id" validate:"required,uuid"`
-	TotalScore int       `json:"total_score" validate:"required,min=1"`
-}
-
 type QuizDto struct {
 	Id        uuid.UUID     `json:"id" db:"id"`
 	Theme     string        `json:"theme" db:"theme"`
