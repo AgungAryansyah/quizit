@@ -22,18 +22,6 @@ func (h *Handler) GetArticle(ctx *fiber.Ctx) error {
 	return response.HttpSuccess(ctx, "success", article)
 }
 
-func (h *Handler) GetArticles(ctx *fiber.Ctx) error {
-	page := ctx.QueryInt("page", 1)
-	pageSize := ctx.QueryInt("size", 9)
-
-	articles, err := h.service.ArticleServie.GetArticles(page, pageSize)
-	if err != nil {
-		return err
-	}
-
-	return response.HttpSuccess(ctx, "success", articles)
-}
-
 func (h *Handler) CreateArticle(ctx *fiber.Ctx) error {
 	var create dto.CreateArticle
 	if err := ctx.BodyParser(&create); err != nil {
@@ -51,4 +39,17 @@ func (h *Handler) CreateArticle(ctx *fiber.Ctx) error {
 	}
 
 	return response.HttpSuccess(ctx, "success", articleId)
+}
+
+func (h *Handler) SearchArticles(ctx *fiber.Ctx) error {
+	page := ctx.QueryInt("page", 1)
+	pageSize := ctx.QueryInt("size", 9)
+	keyword := ctx.Query("keyword", "")
+
+	articles, err := h.service.ArticleServie.SearchArticles(keyword, page, pageSize)
+	if err != nil {
+		return err
+	}
+
+	return response.HttpSuccess(ctx, "success", articles)
 }
