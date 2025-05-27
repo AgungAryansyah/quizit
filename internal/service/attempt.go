@@ -31,7 +31,7 @@ func NewAttemptService(AttemptRepository repository.IAttemptRepository, QuizRepo
 func (s *AttemptService) CreateAttempt(answers dto.UserAnswersDto, userId uuid.UUID) (attempt *entity.Attempt, err error) {
 	var score int
 
-	quiz, err := s.QuizRepository.GetQuizByCode(answers.QuizCode)
+	quiz, err := s.QuizRepository.GetQuiz(answers.Id)
 	if err != nil {
 		return nil, err
 	}
