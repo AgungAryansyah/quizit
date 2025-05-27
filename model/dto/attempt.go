@@ -3,8 +3,8 @@ package dto
 import "github.com/google/uuid"
 
 type UserAnswersDto struct {
-	QuizCode string                  `json:"quiz_code" validate:"required"`
-	Answers  map[uuid.UUID]uuid.UUID `json:"answers" validate:"required,answers_map"`
+	Id      uuid.UUID               `json:"quiz_id" validate:"required"`
+	Answers map[uuid.UUID]uuid.UUID `json:"answers" validate:"required,answers_map"`
 }
 
 type CreateAttempt struct {

@@ -52,3 +52,17 @@ func (h *Handler) CreateQuiz(ctx *fiber.Ctx) error {
 
 	return response.HttpSuccess(ctx, "success", res)
 }
+
+func (h *Handler) GetQuiz(ctx *fiber.Ctx) error {
+	quizCode := ctx.Params("code")
+	if len(quizCode) != 6 {
+		return &response.BadRequest
+	}
+
+	quizId, err := h.service.QuizService.GetQuizByCode(quizCode)
+	if err != nil {
+		return err
+	}
+
+	return response.HttpSuccess(ctx, "success", quizId)
+}
