@@ -21,6 +21,7 @@ type IQuizRepository interface {
 	CreateQuestion(question *entity.Question) error
 	CreateOption(option *entity.Option) error
 	GetQuizByCode(quizCode string) (quiz *entity.Quiz, err error)
+	GetUserQuizzes(userId uuid.UUID, page, pageSize int) (quiz *[]entity.Quiz, err error)
 }
 
 type QuizRepository struct {
@@ -187,4 +188,24 @@ func (r *QuizRepository) GetQuizByCode(quizCode string) (quiz *entity.Quiz, err 
 	}
 
 	return quiz, nil
+}
+
+func (r *QuizRepository) GetUserQuizzes(userId uuid.UUID, page, pageSize int) (quiz *[]entity.Quiz, err error) {
+	if page < 1 {
+		page = 1
+	}
+
+	if pageSize < 1 {
+		pageSize = 10
+	}
+
+	offset := (page - 1) * pageSize
+
+	quizzes := &[]entity.Quiz{}
+	query := `SELECT * FROM quizzes WHERE user_id = $1 LIMIT $2 OFFSET $3`
+	err = r.db.Select(quizzes, query, userId, pageSize, offset)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, &response.QuizNotFound
+	}
+	return quizzes, err
 }

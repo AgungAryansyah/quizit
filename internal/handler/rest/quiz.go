@@ -66,3 +66,20 @@ func (h *Handler) GetQuiz(ctx *fiber.Ctx) error {
 
 	return response.HttpSuccess(ctx, "success", quizId)
 }
+
+func (h *Handler) GetUserQuizzes(ctx *fiber.Ctx) error {
+	quizId, err := uuid.Parse(ctx.Params("userId"))
+	if err != nil {
+		return &response.BadRequest
+	}
+
+	page := ctx.QueryInt("page", 1)
+	pageSize := ctx.QueryInt("size", 9)
+
+	quizes, err := h.service.QuizService.GetUserQuizzes(quizId, page, pageSize)
+	if err != nil {
+		return err
+	}
+
+	return response.HttpSuccess(ctx, "success", quizes)
+}

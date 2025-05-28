@@ -29,3 +29,6 @@ go.work.sum
 
 #postgres
 /postgres_data
+
+#vite
+frontend-quizit/quizit/.vite/
