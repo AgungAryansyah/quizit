@@ -20,46 +20,43 @@ export const AuthProvider = ({ children }) => {
 
   const fetchCurrentUser = async () => {
     try {
-      const response = await api.get("/users", { withCredentials: true }); // Using GET /users
-
-      // Extract user data based on the confirmed structure:
-      // response.data = { message: "success", payload: [{ user_object }] }
+      const response = await api.get("/users", { withCredentials: true });
       if (response.data && response.data.payload && Array.isArray(response.data.payload) && response.data.payload.length > 0) {
-        const userDataFromPayload = response.data.payload[0]; // Get the first object from the payload array
-
-        if (userDataFromPayload && Object.keys(userDataFromPayload).length > 0 && userDataFromPayload.name) {
-          // Now userDataFromPayload is the user object { user_id, name, email, ... }
+        const userDataFromPayload = response.data.payload[0];
+        if (userDataFromPayload && typeof userDataFromPayload === 'object' && Object.keys(userDataFromPayload).length > 0 && userDataFromPayload.name) {
           setUser(userDataFromPayload);
-          localStorage.setItem("user", JSON.stringify(userDataFromPayload)); // Cache after successful fetch
+          localStorage.setItem("user", JSON.stringify(userDataFromPayload));
           return userDataFromPayload;
-        } else {
-          // Payload[0] was empty, not a proper object, or missing 'name'
-          setUser(null);
-          localStorage.removeItem("user");
-          return null;
         }
-      } else {
-        // Payload was missing, not an array, or empty
-        setUser(null);
-        localStorage.removeItem("user");
-        return null;
       }
-    } catch (error) {
       setUser(null);
       localStorage.removeItem("user");
-      localStorage.removeItem("authToken"); // Clear any old client-side token
+      return null;
+    } catch (error) {
+      // This catch handles API errors (e.g., 401 if no valid session, network errors)
+      setUser(null);
+      localStorage.removeItem("user");
+      localStorage.removeItem("authToken");
       return null;
     }
   };
 
   useEffect(() => {
-    // Call fetchCurrentUser on initial load/refresh to maintain session
     const initializeAuth = async () => {
-      await fetchCurrentUser(); 
-      setLoading(false);    
+      try {
+        await fetchCurrentUser();
+      } catch (e) {
+        console.error("AuthContext: Critical error during initializeAuth's call to fetchCurrentUser:", e);
+        setUser(null); // Ensure user is null
+        localStorage.removeItem("user");
+        localStorage.removeItem("authToken");
+      } finally {
+        setLoading(false);
+      }
     };
+
     initializeAuth();
-  }, []); // Empty dependency array: runs once on mount
+  }, []); // Empty dependency array: runs once on AuthProvider mount
 
   const login = async (email, password) => {
     setLoading(true);
@@ -87,7 +84,6 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       await api.post("/auths/register", { name, email, password });
-      // After successful registration, user is redirected to the login page
       return { success: true }; 
     } catch (error) {
       return {
@@ -104,7 +100,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await api.post("/auths/logout", {}, { withCredentials: true });
     } catch (error) {
-      // Log or handle backend logout error, but proceed with client-side cleanup
+      console.warn("AuthContext: Backend logout call failed or not implemented.", error);
     } finally {
       localStorage.removeItem("authToken");
       localStorage.removeItem("user");
