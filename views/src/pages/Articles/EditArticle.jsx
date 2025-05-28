@@ -1,12 +1,11 @@
-// src/pages/Articles/EditArticle.jsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import api from "../../config/api"; // Ensure this path is correct
-import Card from "../../components/UI/Card"; // Ensure this path is correct
-import Button from "../../components/UI/Button"; // Ensure this path is correct
-import Input from "../../components/UI/Input"; // Ensure this path is correct
+import api from "../../config/api"; 
+import Card from "../../components/UI/Card"; 
+import Button from "../../components/UI/Button"; 
+import Input from "../../components/UI/Input"; 
 import { ArrowLeft } from "lucide-react";
 
 const EditArticle = () => {
@@ -15,8 +14,8 @@ const EditArticle = () => {
   const location = useLocation();
 
   const [article, setArticle] = useState({ title: "", content: "" });
-  const [loading, setLoading] = useState(false); // For form submission
-  const [pageLoading, setPageLoading] = useState(true); // For fetching initial article data
+  const [loading, setLoading] = useState(false); 
+  const [pageLoading, setPageLoading] = useState(true); 
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -76,8 +75,6 @@ const EditArticle = () => {
     };
 
     try {
-      // **FIXED HERE: Changed to api.patch and using /articles endpoint**
-      // The backend will identify the article to update from the 'id' in the payload.
       await api.patch("/articles", payload); 
       navigate(`/articles/${articleId}`); // Navigate to the updated article's detail page
     } catch (err) {

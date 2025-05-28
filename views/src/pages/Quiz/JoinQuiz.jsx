@@ -2,10 +2,10 @@
 
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import api from "../../config/api" // Ensure this path is correct
-import Card from "../../components/UI/Card" // Ensure this path is correct
-import Button from "../../components/UI/Button" // Ensure this path is correct
-import Input from "../../components/UI/Input" // Ensure this path is correct
+import api from "../../config/api"
+import Card from "../../components/UI/Card"
+import Button from "../../components/UI/Button"
+import Input from "../../components/UI/Input"
 
 const JoinQuiz = () => {
   const navigate = useNavigate()
@@ -15,9 +15,8 @@ const JoinQuiz = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const trimmedCode = quizCode.trim(); // Trim whitespace
+    const trimmedCode = quizCode.trim();
 
-    // Validate the trimmed code
     if (!trimmedCode || trimmedCode.length !== 6) {
       setError("Please enter a valid 6-character quiz code.")
       return
@@ -26,16 +25,15 @@ const JoinQuiz = () => {
     setLoading(true)
     setError("")
 
-    // Send the code as is (case-sensitive)
-    const codeToSend = trimmedCode; 
+    const codeToSend = trimmedCode;
 
     try {
-      const response = await api.get(`/quizzes/${codeToSend}`) // Use the original case code
-      
+      const response = await api.get(`/quizzes/${codeToSend}`)
+
       if (response.data && response.data.payload && Array.isArray(response.data.payload) && response.data.payload.length > 0) {
         const quizId = response.data.payload[0];
         if (quizId) {
-          navigate(`/quiz/${quizId}`); 
+          navigate(`/quiz/${quizId}`);
         } else {
           throw new Error("Received an invalid Quiz ID from the server.");
         }
@@ -64,22 +62,19 @@ const JoinQuiz = () => {
             <Input
               label="Quiz Code"
               value={quizCode}
-              // Store the exact case typed by the user
-              onChange={(e) => setQuizCode(e.target.value)} 
+              onChange={(e) => setQuizCode(e.target.value)}
               placeholder="Enter 6-character quiz code"
-              // className removed 'uppercase' if it was there from previous suggestion
-              className="text-center text-lg font-mono tracking-wider" 
+              className="text-center text-lg font-mono tracking-wider"
               maxLength={6}
               minLength={6}
-              // You might want to consider `autoCapitalize="off"` and `autoCorrect="off"` for mobile UX
               autoCapitalize="off"
               autoCorrect="off"
             />
 
-            <Button 
-              type="submit" 
-              className="w-full" 
-              loading={loading} 
+            <Button
+              type="submit"
+              className="w-full"
+              loading={loading}
               disabled={loading || quizCode.trim().length !== 6}
             >
               Join Quiz

@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import api from "../../config/api" // Ensure this path is correct
-import Card from "../../components/UI/Card" // Ensure this path is correct
-import Button from "../../components/UI/Button" // Ensure this path is correct
-import Input from "../../components/UI/Input" // Ensure this path is correct
+import api from "../../config/api" 
+import Card from "../../components/UI/Card" 
+import Button from "../../components/UI/Button" 
+import Input from "../../components/UI/Input" 
 import { Search, Plus, Calendar, ChevronLeft, ChevronRight } from "lucide-react"
 
 const Articles = () => {
@@ -14,14 +14,13 @@ const Articles = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
-  const [isLastPage, setIsLastPage] = useState(false) // To help disable 'Next' button
+  const [isLastPage, setIsLastPage] = useState(false) 
   const articlesPerPage = 6;
 
-  // Debounce effect for search term
   useEffect(() => {
     const timerId = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
-      setCurrentPage(1); // Reset to page 1 for new search
+      setCurrentPage(1); 
     }, 500); // 500ms delay before triggering search
 
     return () => {
@@ -29,7 +28,6 @@ const Articles = () => {
     };
   }, [searchTerm]);
 
-  // Effect for fetching articles when debouncedSearchTerm or currentPage changes
   useEffect(() => {
     fetchArticles(debouncedSearchTerm, currentPage);
   }, [debouncedSearchTerm, currentPage]);
@@ -41,19 +39,18 @@ const Articles = () => {
         `/articles?keyword=${encodeURIComponent(keyword)}&page=${page}&size=${articlesPerPage}`
       );
       
-      const rawArticles = response.data.payload?.[0] || []; // Safely access nested array
+      const rawArticles = response.data.payload?.[0] || []; 
 
       const formattedArticles = rawArticles.map(article => ({
         ...article,
         content: article.text || "",
-        // author field is not used for display
       }));
       setArticles(formattedArticles);
-      setIsLastPage(formattedArticles.length < articlesPerPage); // Heuristic for last page
+      setIsLastPage(formattedArticles.length < articlesPerPage); 
     } catch (error) {
       console.error("Error fetching articles:", error);
       setArticles([]);
-      setIsLastPage(true); // Assume last page on error
+      setIsLastPage(true); 
     } finally {
       setLoading(false);
     }
@@ -69,7 +66,7 @@ const Articles = () => {
     }
   };
 
-  if (loading && articles.length === 0) { // Show full page loader only on initial load
+  if (loading && articles.length === 0) { 
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>

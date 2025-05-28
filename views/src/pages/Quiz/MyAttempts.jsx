@@ -1,12 +1,11 @@
-// src/pages/Quiz/MyAttempts.jsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext"; // Adjust path
-import api from "../../config/api"; // Adjust path
-import Card from "../../components/UI/Card"; // Adjust path
-import Button from "../../components/UI/Button"; // Adjust path
+import { useAuth } from "../../contexts/AuthContext";
+import api from "../../config/api";
+import Card from "../../components/UI/Card";
+import Button from "../../components/UI/Button";
 import { CheckCircle, CalendarCheck, ChevronLeft, ChevronRight, RotateCcw, Eye } from "lucide-react";
 
 const MyAttempts = () => {
@@ -17,7 +16,7 @@ const MyAttempts = () => {
   const [pageLoading, setPageLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLastPage, setIsLastPage] = useState(false);
-  const attemptsPerPage = 6; // Or your preferred number
+  const attemptsPerPage = 6;
 
   useEffect(() => {
     if (!authLoading && user?.user_id) {
@@ -32,13 +31,10 @@ const MyAttempts = () => {
   const fetchUserAttempts = async (page) => {
     setPageLoading(true);
     try {
-      // API endpoint for user's attempts with pagination
       const response = await api.get(
         `/attempts/user?page=${page}&size=${attemptsPerPage}`
       );
-      
       const rawAttempts = response.data.payload?.[0] || [];
-      // Assuming backend provides quiz_title or a quiz object within attempt
       const formattedAttempts = rawAttempts.map(attempt => ({
         ...attempt,
         quiz_title: attempt.quiz?.title || attempt.quiz_title || `Quiz ID: ${attempt.quiz_id}`
@@ -93,7 +89,7 @@ const MyAttempts = () => {
             </h1>
             <p className="text-gray-600 mt-2">Review your past quiz performance.</p>
           </div>
-           <Link to="/join-quiz"> {/* Or link to /quizzes */}
+           <Link to="/join-quiz">
             <Button className="mt-4 md:mt-0">Take a New Quiz</Button>
           </Link>
         </div>
@@ -106,7 +102,7 @@ const MyAttempts = () => {
         )}
 
         {!pageLoading && attempts.length > 0 ? (
-          <div className="space-y-6"> {/* Changed to a list view for attempts */}
+          <div className="space-y-6">
             {attempts.map((attempt) => (
               <Card key={attempt.id} className="hover:shadow-md transition-shadow duration-200">
                 <div className="p-4">
@@ -154,7 +150,7 @@ const MyAttempts = () => {
               <div className="text-gray-500">
                 <h3 className="text-lg font-medium mb-2">No quiz attempts found.</h3>
                 <p className="mb-4">Try taking some quizzes!</p>
-                <Link to="/quizzes"> {/* Link to general quizzes page */}
+                <Link to="/quizzes">
                   <Button>Find a Quiz</Button>
                 </Link>
               </div>

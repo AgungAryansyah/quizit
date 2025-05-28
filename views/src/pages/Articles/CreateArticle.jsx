@@ -2,17 +2,17 @@
 
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import api from "../../config/api" // Ensure this path is correct
-import Card from "../../components/UI/Card" // Ensure this path is correct
-import Button from "../../components/UI/Button" // Ensure this path is correct
-import Input from "../../components/UI/Input" // Ensure this path is correct
+import api from "../../config/api" 
+import Card from "../../components/UI/Card" 
+import Button from "../../components/UI/Button" 
+import Input from "../../components/UI/Input" 
 
 const CreateArticle = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [article, setArticle] = useState({
     title: "",
-    content: "", // Frontend uses 'content'
+    content: "", 
   })
 
   const handleChange = (field, value) => {
@@ -26,21 +26,16 @@ const CreateArticle = () => {
     e.preventDefault()
     setLoading(true)
 
-    // Prepare the payload according to backend expectations
     const payload = {
       title: article.title,
-      text: article.content, // Map frontend 'content' to backend 'text'
+      text: article.content, 
     }
 
     try {
-      // Send the transformed payload
-      // The 'api' instance should handle sending auth cookies if required by the backend
       const response = await api.post("/articles", payload) 
-      // response.data might contain the new articleId if needed: response.data.data
-      navigate("/articles") // Navigate to articles list page on success
+      navigate("/articles") 
     } catch (error) {
       console.error("Error creating article:", error)
-      // Consider showing a more specific error message if available from error.response.data.message
       alert(error.response?.data?.message || "Failed to create article. Please try again.")
     } finally {
       setLoading(false)
