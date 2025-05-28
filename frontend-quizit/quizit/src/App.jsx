@@ -15,6 +15,7 @@ import ArticleDetail from "./pages/Articles/ArticleDetail";
 import CreateArticle from "./pages/Articles/CreateArticle";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import MyArticles from "./pages/Articles/MyArticles"; // Import the new component
+import Quizzes from "./pages/Quiz/Quizzes"; // Import the new Quizzes component
 import ProtectedRoute from "./components/Auth/ProtectedRoute"; // Using the version above
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
             <Route path="/articles" element={<Articles />} />
             <Route path="/articles/:articleId" element={<ArticleDetail />} />
             <Route path="/create-article" element={<CreateArticle />} />
+            <Route path="/quizzes" element={<Quizzes />} />   {/* New quizzes page */}
             {/* Add any other routes that need protection here */}
           </Route>
 
