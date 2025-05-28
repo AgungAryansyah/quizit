@@ -49,6 +49,7 @@ func mountQuiz(routerGroup fiber.Router, handler rest.Handler, middleware middle
 	quiz.Get("/:id/questions/options", middleware.Authentication, handler.GetQuizWithQuestionAndOption)
 	quiz.Post("/", middleware.Authentication, handler.CreateQuiz)
 	quiz.Get("/:code", middleware.Authentication, handler.GetQuiz)
+	quiz.Get("/users/:userId", middleware.Authentication, handler.GetUserQuizzes)
 }
 
 func mountAttempt(routerGroup fiber.Router, handler rest.Handler, middleware middleware.IMiddleware) {
