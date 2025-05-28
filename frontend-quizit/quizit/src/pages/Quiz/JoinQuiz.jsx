@@ -90,7 +90,7 @@ const JoinQuiz = () => {
             <p className="text-gray-600">
               {"Don't have a quiz code? "}
               <button
-                onClick={() => navigate("/dashboard")}
+                onClick={() => navigate("/create-quiz")}
                 className="text-primary-600 hover:text-primary-500 font-medium"
               >
                 Create your own quiz
