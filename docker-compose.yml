@@ -32,6 +32,18 @@ services:
     depends_on:
       - quizit-postgres
     restart: on-failure
+
+  quizit-fe:
+    container_name: "quizit-fe"
+    build:
+      context: ./views
+    ports:
+      - "5173:5173"
+    networks:
+      - quizit-network
+    depends_on:
+      - quizit-be
+    restart: on-failure
     
 networks:
   quizit-network:
