@@ -71,4 +71,5 @@ func mountArtice(routerGroup fiber.Router, handler rest.Handler, middleware midd
 	article.Get("/:id", middleware.Authentication, handler.GetArticle)
 	article.Post("/", middleware.Authentication, handler.CreateArticle)
 	article.Get("/", middleware.Authentication, handler.SearchArticles)
+	article.Get("/users/:userId", middleware.Authentication, handler.GetUserArticles)
 }

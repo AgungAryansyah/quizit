@@ -14,6 +14,7 @@ type IArticleRepository interface {
 	GetArticle(articleId uuid.UUID) (article *entity.Article, err error)
 	CreateArticle(article *entity.Article) error
 	SearchArticles(keyword string, page, pageSize int) (articles *[]entity.Article, err error)
+	GetUserArticles(userId uuid.UUID, page, pageSize int) (articles *[]entity.Article, err error)
 }
 
 type ArticleRepository struct {
@@ -69,6 +70,30 @@ func (r *ArticleRepository) SearchArticles(keyword string, page, pageSize int) (
 		LIMIT $2 OFFSET $3
 	`
 	err = r.db.Select(articles, query, "%"+keyword+"%", pageSize, offset)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, &response.ArticleNotFound
+		}
+		return nil, err
+	}
+
+	return articles, err
+}
+
+func (r *ArticleRepository) GetUserArticles(userId uuid.UUID, page, pageSize int) (articles *[]entity.Article, err error) {
+	if page < 1 {
+		page = 1
+	}
+
+	if pageSize < 1 {
+		pageSize = 10
+	}
+
+	offset := (page - 1) * pageSize
+
+	articles = &[]entity.Article{}
+	query := `SELECT * FROM articles WHERE user_id = $1 LIMIT $2 OFFSET $3`
+	err = r.db.Select(articles, query, userId, pageSize, offset)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, &response.ArticleNotFound

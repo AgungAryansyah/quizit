@@ -12,6 +12,7 @@ type IArticleServie interface {
 	GetArticle(articleId uuid.UUID) (article *dto.ArticleDto, err error)
 	CreateArticle(create *dto.CreateArticle, userId uuid.UUID) (articleId *uuid.UUID, err error)
 	SearchArticles(keyword string, page, pageSize int) (articles *[]entity.Article, err error)
+	GetUserArticles(userId uuid.UUID, page, pageSize int) (articles *[]entity.Article, err error)
 }
 
 type ArticleServie struct {
@@ -63,4 +64,8 @@ func (s *ArticleServie) CreateArticle(create *dto.CreateArticle, userId uuid.UUI
 
 func (s *ArticleServie) SearchArticles(keyword string, page, pageSize int) (articles *[]entity.Article, err error) {
 	return s.ArticleRepository.SearchArticles(keyword, page, pageSize)
+}
+
+func (s *ArticleServie) GetUserArticles(userId uuid.UUID, page, pageSize int) (articles *[]entity.Article, err error) {
+	return s.ArticleRepository.GetUserArticles(userId, page, pageSize)
 }
