@@ -13,7 +13,9 @@ import QuizResults from "./pages/Quiz/QuizResults";
 import Articles from "./pages/Articles/Articles";
 import ArticleDetail from "./pages/Articles/ArticleDetail";
 import CreateArticle from "./pages/Articles/CreateArticle";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/Dashboard/Dashboard";
+import MyArticles from "./pages/Articles/MyArticles"; // Import the new component
+import Quizzes from "./pages/Quiz/Quizzes"; // Import the new Quizzes component
 import ProtectedRoute from "./components/Auth/ProtectedRoute"; // Using the version above
 
 function App() {
@@ -31,6 +33,7 @@ function App() {
           {/* ProtectedRoute now acts as a layout for authenticated routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/my-articles" element={<MyArticles />} />
             <Route path="/create-quiz" element={<CreateQuiz />} />
             <Route path="/join-quiz" element={<JoinQuiz />} />
             <Route path="/quiz/:quizId" element={<TakeQuiz />} />
@@ -38,6 +41,7 @@ function App() {
             <Route path="/articles" element={<Articles />} />
             <Route path="/articles/:articleId" element={<ArticleDetail />} />
             <Route path="/create-article" element={<CreateArticle />} />
+            <Route path="/quizzes" element={<Quizzes />} />   {/* New quizzes page */}
             {/* Add any other routes that need protection here */}
           </Route>
 
