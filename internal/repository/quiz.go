@@ -12,7 +12,6 @@ import (
 )
 
 type IQuizRepository interface {
-	GetAllQuizzes(page, pageSize int) (quiz *[]entity.Quiz, err error)
 	GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *dto.QuizDto, err error)
 	GetQuiz(quizId uuid.UUID) (quiz *entity.Quiz, err error)
 	IsCorrect(OptionId uuid.UUID) (correct bool, err error)
@@ -22,6 +21,8 @@ type IQuizRepository interface {
 	CreateOption(option *entity.Option) error
 	GetQuizByCode(quizCode string) (quiz *entity.Quiz, err error)
 	GetUserQuizzes(userId uuid.UUID, page, pageSize int) (quiz *[]entity.Quiz, err error)
+	GetQuizzes(keyword string, page, pageSize int) (quiz *[]entity.Quiz, err error)
+	DeleteQuiz(quizId uuid.UUID, userId uuid.UUID) error
 }
 
 type QuizRepository struct {
@@ -32,26 +33,6 @@ func NewQuizRepository(db *sqlx.DB) IQuizRepository {
 	return &QuizRepository{
 		db: db,
 	}
-}
-
-func (r *QuizRepository) GetAllQuizzes(page, pageSize int) (quiz *[]entity.Quiz, err error) {
-	if page < 1 {
-		page = 1
-	}
-
-	if pageSize < 1 {
-		pageSize = 10
-	}
-
-	offset := (page - 1) * pageSize
-
-	quizzes := &[]entity.Quiz{}
-	query := `SELECT * FROM quizzes LIMIT $1 OFFSET $2`
-	err = r.db.Select(quizzes, query, pageSize, offset)
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, &response.QuizNotFound
-	}
-	return quizzes, err
 }
 
 func (r *QuizRepository) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *dto.QuizDto, err error) {
@@ -208,4 +189,43 @@ func (r *QuizRepository) GetUserQuizzes(userId uuid.UUID, page, pageSize int) (q
 		return nil, &response.QuizNotFound
 	}
 	return quizzes, err
+}
+
+func (r *QuizRepository) GetQuizzes(keyword string, page, pageSize int) (quiz *[]entity.Quiz, err error) {
+	if page < 1 {
+		page = 1
+	}
+
+	if pageSize < 1 {
+		pageSize = 10
+	}
+
+	offset := (page - 1) * pageSize
+
+	quizzes := &[]entity.Quiz{}
+	query := `
+		SELECT * FROM quizzes 
+		WHERE 
+			title ILIKE $1 OR
+			theme ILIKE $1 
+		LIMIT $2 OFFSET $3
+	`
+	err = r.db.Select(quizzes, query, "%"+keyword+"%", pageSize, offset)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, &response.QuizNotFound
+	}
+	return quizzes, err
+}
+
+func (r *QuizRepository) DeleteQuiz(quizId uuid.UUID, userId uuid.UUID) error {
+	query := `DELETE FROM quizzes WHERE id = $1 AND user_id = $2`
+	_, err := r.db.Exec(query, quizId, userId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return &response.ArticleNotFound
+		}
+		return err
+	}
+
+	return nil
 }

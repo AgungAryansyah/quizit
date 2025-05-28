@@ -10,11 +10,12 @@ import (
 )
 
 type IQuizService interface {
-	GetAllQuizzes(page, pageSize int) (quiz *[]entity.Quiz, err error)
+	GetAllQuizzes(keyword string, page, pageSize int) (quiz *[]entity.Quiz, err error)
 	GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *dto.QuizDto, err error)
 	CreateQuiz(createQuiz *dto.CreateQuiz, userId uuid.UUID) (res *dto.CreateQuizRes, err error)
 	GetQuizByCode(quizCode string) (quizId *uuid.UUID, err error)
 	GetUserQuizzes(userId uuid.UUID, page, pageSize int) (quiz *[]entity.Quiz, err error)
+	DeleteQuiz(quizId uuid.UUID, userId uuid.UUID) error
 }
 
 type QuizService struct {
@@ -29,8 +30,8 @@ func NewQuizService(QuizRepository repository.IQuizRepository, UserRepository re
 	}
 }
 
-func (s *QuizService) GetAllQuizzes(page, pageSize int) (quiz *[]entity.Quiz, err error) {
-	return s.QuizRepository.GetAllQuizzes(page, pageSize)
+func (s *QuizService) GetAllQuizzes(keyword string, page, pageSize int) (quiz *[]entity.Quiz, err error) {
+	return s.QuizRepository.GetQuizzes(keyword, page, pageSize)
 }
 
 func (s *QuizService) GetQuizWithQuestionAndOption(quizId uuid.UUID) (quiz *dto.QuizDto, err error) {
@@ -109,4 +110,8 @@ func (s *QuizService) GetQuizByCode(quizCode string) (quizId *uuid.UUID, err err
 
 func (s *QuizService) GetUserQuizzes(userId uuid.UUID, page, pageSize int) (quiz *[]entity.Quiz, err error) {
 	return s.QuizRepository.GetUserQuizzes(userId, page, pageSize)
+}
+
+func (s *QuizService) DeleteQuiz(quizId uuid.UUID, userId uuid.UUID) error {
+	return s.QuizRepository.DeleteQuiz(quizId, userId)
 }
