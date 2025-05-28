@@ -1,3 +1,4 @@
+// src/pages/Dashboard.jsx
 "use client"
 
 import { useState, useEffect } from "react"
@@ -6,26 +7,24 @@ import { useAuth } from "../../contexts/AuthContext"
 import api from "../../config/api"
 import Card from "../../components/UI/Card"
 import Button from "../../components/UI/Button"
-import { Plus, BookOpen, Users, Edit3, FileText, CheckCircle, RotateCcw, Eye } from "lucide-react" // Added more icons
+import { Plus, BookOpen, Users, Edit3, FileText, CheckCircle, RotateCcw, Eye } from "lucide-react"
 
 const Dashboard = () => {
-  const { user, loading: authLoading } = useAuth() // Get user and auth loading state
+  const { user, loading: authLoading } = useAuth()
   const navigate = useNavigate();
 
   const [myQuizzes, setMyQuizzes] = useState([])
   const [myArticles, setMyArticles] = useState([])
   const [myAttempts, setMyAttempts] = useState([])
-  const [dashboardLoading, setDashboardLoading] = useState(true) // Specific loading state for dashboard data
+  const [dashboardLoading, setDashboardLoading] = useState(true)
 
   useEffect(() => {
-    // Only fetch data if auth loading is done and user object (with user_id) is available
     if (!authLoading && user?.user_id) {
       fetchDashboardData(user.user_id);
     } else if (!authLoading && !user) {
-      // If auth is done and there's no user, stop dashboard loading. ProtectedRoute should handle redirection.
       setDashboardLoading(false);
     }
-  }, [user, authLoading]); // Depend on user and authLoading
+  }, [user, authLoading]);
 
   const fetchDashboardData = async (userId) => {
     setDashboardLoading(true);
@@ -33,10 +32,9 @@ const Dashboard = () => {
       const [quizzesRes, articlesRes, attemptsRes] = await Promise.all([
         api.get(`/quizzes/users/${userId}?page=1&size=5`), 
         api.get(`/articles/users/${userId}?page=1&size=5`), 
-        api.get("/attempts/user?page=1&size=5") // This endpoint infers user from session
+        api.get("/attempts/user?page=1&size=5")
       ]);
 
-      // All responses are expected to have data in response.data.payload[0]
       setMyQuizzes(quizzesRes.data?.payload?.[0] || []);
       
       const formattedArticles = (articlesRes.data?.payload?.[0] || []).map(article => ({
@@ -45,14 +43,8 @@ const Dashboard = () => {
       }));
       setMyArticles(formattedArticles);
       
-      // For attempts, we might need to enrich with quiz_title if not present.
-      // For now, assume attemptsRes.data.payload[0] is the array of attempts.
-      // The backend example for attempts doesn't include quiz_title.
       setMyAttempts((attemptsRes.data?.payload?.[0] || []).map(attempt => ({
         ...attempt,
-        // If your /attempts/user endpoint doesn't provide quiz_title, you'll have to manage
-        // fetching it separately or display quiz_id. For now, we'll assume it might come
-        // or we'll display quiz_id. Let's assume it might have attempt.quiz?.title or attempt.quiz_title
         quiz_title: attempt.quiz?.title || attempt.quiz_title || `Quiz ID: ${attempt.quiz_id}`
       })));
 
@@ -66,7 +58,6 @@ const Dashboard = () => {
     }
   }
 
-  // Show main loader if AuthContext is loading or if user is present but dashboard data isn't loaded yet.
   if (authLoading || (user && dashboardLoading && myArticles.length === 0 && myQuizzes.length === 0 && myAttempts.length === 0) ) { 
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -75,16 +66,14 @@ const Dashboard = () => {
     );
   }
   
-  // If auth is done, but no user (should be handled by ProtectedRoute, but as a fallback)
-  if (!user) {
+  if (!user && !authLoading) {
     return (
         <div className="min-h-screen bg-gray-50 py-8 text-center">
-            <p>Please log in to view your dashboard.</p>
+            <p className="text-xl text-gray-700">Please log in to view your dashboard.</p>
             <Link to="/login"><Button className="mt-4">Go to Login</Button></Link>
         </div>
     );
   }
-
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -118,7 +107,7 @@ const Dashboard = () => {
         </Card>
         
         {dashboardLoading && (myArticles.length > 0 || myQuizzes.length > 0 || myAttempts.length > 0) && (
-             <div className="text-center py-10"> {/* Loader for when data is refreshing but some old data might be visible */}
+             <div className="text-center py-10">
                 <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 mx-auto"></div>
                 <p className="mt-2 text-gray-600">Refreshing your content...</p>
             </div>
@@ -137,7 +126,8 @@ const Dashboard = () => {
                     <div key={quiz.id} className="flex items-center justify-between p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
                       <div>
                         <h3 className="font-medium text-gray-900">{quiz.title}</h3>
-                        <p className="text-sm text-gray-600">Code: {quiz.quiz_code} - {quiz.questions?.length || 0} questions</p>
+                        {/* Question count removed here */}
+                        <p className="text-sm text-gray-600">Code: {quiz.quiz_code}</p>
                       </div>
                       {quiz.created_at && (<span className="text-xs text-gray-500 flex-shrink-0 ml-2">{new Date(quiz.created_at).toLocaleDateString()}</span>)}
                     </div>
@@ -168,6 +158,7 @@ const Dashboard = () => {
             <Card>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-gray-900 flex items-center"><CheckCircle size={22} className="mr-2 text-green-600"/>My Quiz Attempts</h2>
+                {/* This link should point to the new MyAttempts page */}
                 <Link to="/my-attempts" className="text-green-600 hover:text-green-500 text-sm font-medium">View All</Link>
               </div>
               <div className="space-y-3">
@@ -175,7 +166,7 @@ const Dashboard = () => {
                   myAttempts.map((attempt) => ( 
                     <div key={attempt.id} className="p-3 bg-gray-100 rounded-lg">
                       <div className="mb-1">
-                        <h3 className="font-medium text-gray-900 truncate" title={attempt.quiz_title}>{attempt.quiz_title || `Quiz: ${attempt.quiz_id}`}</h3>
+                        <h3 className="font-medium text-gray-900 truncate" title={attempt.quiz_title}>{attempt.quiz_title}</h3>
                         <p className="text-sm text-gray-600">Score: {attempt.total_score}</p>
                       </div>
                       <div className="flex justify-between items-center text-xs">
@@ -210,7 +201,7 @@ const Dashboard = () => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default Dashboard;
