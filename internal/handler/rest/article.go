@@ -70,3 +70,41 @@ func (h *Handler) GetUserArticles(ctx *fiber.Ctx) error {
 
 	return response.HttpSuccess(ctx, "success", articles)
 }
+
+func (h *Handler) DeleteArticle(ctx *fiber.Ctx) error {
+	userId, ok := ctx.Locals("userId").(uuid.UUID)
+	if !ok {
+		return &response.Unauthorized
+	}
+
+	articleId, err := uuid.Parse(ctx.Params("id"))
+	if err != nil {
+		return &response.BadRequest
+	}
+
+	err = h.service.ArticleServie.DeleteArticle(articleId, userId)
+	if err != nil {
+		return err
+	}
+
+	return response.HttpSuccess(ctx, "success", nil)
+}
+
+func (h *Handler) EditArticle(ctx *fiber.Ctx) error {
+	userId, ok := ctx.Locals("userId").(uuid.UUID)
+	if !ok {
+		return &response.Unauthorized
+	}
+
+	var edit dto.EditArticle
+	if err := ctx.BodyParser(&edit); err != nil {
+		return &response.Unauthorized
+	}
+
+	err := h.service.ArticleServie.EditArticle(&edit, userId)
+	if err != nil {
+		return err
+	}
+
+	return response.HttpSuccess(ctx, "success", nil)
+}

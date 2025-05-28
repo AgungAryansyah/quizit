@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"errors"
+	"quizit-be/model/dto"
 	"quizit-be/model/entity"
 	"quizit-be/pkg/response"
 
@@ -15,6 +16,8 @@ type IArticleRepository interface {
 	CreateArticle(article *entity.Article) error
 	SearchArticles(keyword string, page, pageSize int) (articles *[]entity.Article, err error)
 	GetUserArticles(userId uuid.UUID, page, pageSize int) (articles *[]entity.Article, err error)
+	DeleteArticle(articleId uuid.UUID, userId uuid.UUID) error
+	EditArticle(edit *dto.EditArticle, userId uuid.UUID) error
 }
 
 type ArticleRepository struct {
@@ -102,4 +105,32 @@ func (r *ArticleRepository) GetUserArticles(userId uuid.UUID, page, pageSize int
 	}
 
 	return articles, err
+}
+
+func (r *ArticleRepository) DeleteArticle(articleId uuid.UUID, userId uuid.UUID) error {
+	query := `DELETE FROM articles WHERE id = $1 AND user_id = $2`
+	_, err := r.db.Exec(query, articleId, userId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return &response.ArticleNotFound
+		}
+		return err
+	}
+
+	return nil
+
+}
+
+func (r *ArticleRepository) EditArticle(edit *dto.EditArticle, userId uuid.UUID) error {
+	query := `UPDATE articles SET title = $1, text = $2 WHERE id = $3 AND user_id = $4`
+	_, err := r.db.Exec(query, edit.Title, edit.Text, edit.Id, userId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return &response.ArticleNotFound
+		}
+		return err
+	}
+
+	return nil
+
 }
