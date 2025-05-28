@@ -1,3 +1,4 @@
+// src/pages/Articles/MyArticles.jsx
 "use client"
 
 import { useState, useEffect } from "react"
@@ -6,8 +7,8 @@ import { useAuth } from "../../contexts/AuthContext"
 import api from "../../config/api"
 import Card from "../../components/UI/Card"
 import Button from "../../components/UI/Button"
-import Input from "../../components/UI/Input" // Input might still be used elsewhere, or can be removed if not
-import { Plus, Calendar, ChevronLeft, ChevronRight } from "lucide-react" // Search icon removed
+// Input removed as search is removed
+import { Plus, Calendar, ChevronLeft, ChevronRight, Edit, Trash2 } from "lucide-react" // Added Edit, Trash2
 
 const MyArticles = () => {
   const { user, loading: authLoading } = useAuth();
@@ -15,14 +16,11 @@ const MyArticles = () => {
 
   const [articles, setArticles] = useState([])
   const [pageLoading, setPageLoading] = useState(true)
-  // Removed searchTerm and debouncedSearchTerm states
   const [currentPage, setCurrentPage] = useState(1)
   const [isLastPage, setIsLastPage] = useState(false)
   const articlesPerPage = 6;
+  const [actionLoading, setActionLoading] = useState(null); // For individual delete/edit loading
 
-  // Removed useEffect for debouncing search term
-
-  // Effect for fetching articles when currentPage or user changes
   useEffect(() => {
     if (!authLoading && user?.user_id) {
       fetchUserArticles(currentPage, user.user_id);
@@ -43,16 +41,16 @@ const MyArticles = () => {
     }
     setPageLoading(true);
     try {
-      // Removed keyword from API call
       const response = await api.get(
         `/articles/users/${userId}?page=${page}&size=${articlesPerPage}`
       );
       
       const rawArticles = response.data.payload?.[0] || [];
-
       const formattedArticles = rawArticles.map(article => ({
         ...article,
-        content: article.text || "",
+        content: article.text || "", // Mapped from backend 'text'
+        // Storing original text as well if needed for edit form, or map it there
+        originalText: article.text || "",
       }));
       setArticles(formattedArticles);
       setIsLastPage(formattedArticles.length < articlesPerPage);
@@ -75,7 +73,46 @@ const MyArticles = () => {
     }
   };
 
-  if (authLoading || (pageLoading && articles.length === 0)) { 
+  const handleDeleteArticle = async (articleIdToDelete) => {
+    if (window.confirm("Are you sure you want to delete this article?")) {
+      setActionLoading(articleIdToDelete); // Indicate loading for this specific article
+      try {
+        await api.delete(`/articles/${articleIdToDelete}`);
+        // Refetch articles or filter out locally
+        // For simplicity and consistency, refetch. Consider optimizing if many deletions.
+        if (articles.length === 1 && currentPage > 1) {
+            // If it was the last item on a page greater than 1, go to previous page
+            setCurrentPage(currentPage - 1);
+        } else {
+            // Otherwise, refetch current page (or a modified list)
+            fetchUserArticles(currentPage, user.user_id);
+        }
+      } catch (error) {
+        console.error("Error deleting article:", error);
+        alert(error.response?.data?.message || "Failed to delete article.");
+      } finally {
+        setActionLoading(null);
+      }
+    }
+  };
+
+  const handleEditArticle = (articleToEdit) => {
+    // Pass the whole article object, including original 'text' if available
+    // Or just ID if EditArticle page fetches its own data.
+    // For simplicity, we'll pass relevant fields for pre-filling.
+    navigate(`/edit-article/${articleToEdit.id}`, { 
+        state: { 
+            article: {
+                id: articleToEdit.id,
+                title: articleToEdit.title,
+                content: articleToEdit.originalText || articleToEdit.content // Prefer original 'text' for editing
+            }
+        } 
+    });
+  };
+
+
+  if (authLoading || (pageLoading && articles.length === 0 && !user?.user_id)) { 
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
@@ -83,7 +120,7 @@ const MyArticles = () => {
     );
   }
 
-  if (!user) {
+  if (!user && !authLoading) { // If auth is done, but no user
       return (
         <div className="min-h-screen bg-gray-50 py-8 text-center">
           <p className="text-xl text-gray-700">Please log in to see your articles.</p>
@@ -97,7 +134,6 @@ const MyArticles = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">My Articles</h1>
@@ -111,9 +147,6 @@ const MyArticles = () => {
           </Link>
         </div>
 
-        {/* Search Card Removed */}
-
-        {/* Articles Grid - Show loader overlay if loading new page/search within this component's context */}
         {pageLoading && articles.length > 0 && (
             <div className="text-center py-10">
                 <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 mx-auto"></div>
@@ -141,11 +174,33 @@ const MyArticles = () => {
                     )}
                   </div>
                 </div>
-                <Link to={`/articles/${article.id}`} className="mt-auto">
-                  <Button className="w-full"> 
-                    Read More
-                  </Button>
-                </Link>
+                <div className="mt-auto space-y-2"> {/* Actions container */}
+                  <Link to={`/articles/${article.id}`}>
+                    <Button variant="outline" className="w-full"> 
+                      Read More
+                    </Button>
+                  </Link>
+                  <div className="flex space-x-2">
+                    <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="w-full flex items-center justify-center text-blue-600 hover:bg-blue-50"
+                        onClick={() => handleEditArticle(article)}
+                        disabled={actionLoading === article.id}
+                    >
+                        <Edit size={16} className="mr-1" /> Edit
+                    </Button>
+                    <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="w-full flex items-center justify-center text-red-600 hover:bg-red-50"
+                        onClick={() => handleDeleteArticle(article.id)}
+                        disabled={actionLoading === article.id}
+                    >
+                         {actionLoading === article.id ? 'Deleting...' : <><Trash2 size={16} className="mr-1" /> Delete</>}
+                    </Button>
+                  </div>
+                </div>
               </Card>
             ))}
           </div>
@@ -153,7 +208,6 @@ const MyArticles = () => {
           !pageLoading && ( 
             <Card className="text-center py-12">
               <div className="text-gray-500">
-                {/* Simplified "no articles" message as there's no search term */}
                 <h3 className="text-lg font-medium mb-2">You haven't written any articles yet.</h3>
                 <p className="mb-4">Why not share your knowledge?</p>
                 <Link to="/create-article">
@@ -164,12 +218,11 @@ const MyArticles = () => {
           )
         )}
 
-        {/* Pagination Controls */}
         {!pageLoading && (articles.length > 0 || currentPage > 1) && (
             <div className="mt-12 flex justify-center items-center space-x-4">
                 <Button
                     onClick={handlePreviousPage}
-                    disabled={currentPage === 1 || pageLoading}
+                    disabled={currentPage === 1 || pageLoading || actionLoading}
                     variant="outline"
                     className="flex items-center"
                 >
@@ -181,7 +234,7 @@ const MyArticles = () => {
                 </span>
                 <Button
                     onClick={handleNextPage}
-                    disabled={isLastPage || pageLoading}
+                    disabled={isLastPage || pageLoading || actionLoading}
                     variant="outline"
                     className="flex items-center"
                 >
