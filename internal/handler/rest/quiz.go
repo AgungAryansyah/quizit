@@ -11,8 +11,9 @@ import (
 func (h *Handler) GetAllQuizzes(ctx *fiber.Ctx) error {
 	page := ctx.QueryInt("page", 1)
 	pageSize := ctx.QueryInt("size", 9)
+	keyword := ctx.Query("keyword", "")
 
-	quizes, err := h.service.QuizService.GetAllQuizzes(page, pageSize)
+	quizes, err := h.service.QuizService.GetAllQuizzes(keyword, page, pageSize)
 	if err != nil {
 		return err
 	}
@@ -68,7 +69,7 @@ func (h *Handler) GetQuiz(ctx *fiber.Ctx) error {
 }
 
 func (h *Handler) GetUserQuizzes(ctx *fiber.Ctx) error {
-	quizId, err := uuid.Parse(ctx.Params("userId"))
+	userId, err := uuid.Parse(ctx.Params("userId"))
 	if err != nil {
 		return &response.BadRequest
 	}
@@ -76,10 +77,29 @@ func (h *Handler) GetUserQuizzes(ctx *fiber.Ctx) error {
 	page := ctx.QueryInt("page", 1)
 	pageSize := ctx.QueryInt("size", 9)
 
-	quizes, err := h.service.QuizService.GetUserQuizzes(quizId, page, pageSize)
+	quizes, err := h.service.QuizService.GetUserQuizzes(userId, page, pageSize)
 	if err != nil {
 		return err
 	}
 
 	return response.HttpSuccess(ctx, "success", quizes)
+}
+
+func (h *Handler) DeleteQuiz(ctx *fiber.Ctx) error {
+	quizId, err := uuid.Parse(ctx.Params("quizId"))
+	if err != nil {
+		return &response.BadRequest
+	}
+
+	userId, ok := ctx.Locals("userId").(uuid.UUID)
+	if !ok {
+		return &response.Unauthorized
+	}
+
+	err = h.service.QuizService.DeleteQuiz(quizId, userId)
+	if err != nil {
+		return err
+	}
+
+	return response.HttpSuccess(ctx, "success", nil)
 }

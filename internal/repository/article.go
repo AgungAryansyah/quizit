@@ -118,7 +118,6 @@ func (r *ArticleRepository) DeleteArticle(articleId uuid.UUID, userId uuid.UUID)
 	}
 
 	return nil
-
 }
 
 func (r *ArticleRepository) EditArticle(edit *dto.EditArticle, userId uuid.UUID) error {
@@ -132,5 +131,4 @@ func (r *ArticleRepository) EditArticle(edit *dto.EditArticle, userId uuid.UUID)
 	}
 
 	return nil
-
 }
