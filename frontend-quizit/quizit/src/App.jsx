@@ -17,6 +17,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import MyArticles from "./pages/Articles/MyArticles"; // Import the new component
 import Quizzes from "./pages/Quiz/Quizzes"; // Import the new Quizzes component
 import EditArticle from "./pages/Articles/EditArticle"; // Import the new component
+import MyQuizzes from "./pages/Quiz/MyQuizzes"; // Import the new component
 import ProtectedRoute from "./components/Auth/ProtectedRoute"; // Using the version above
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
             <Route path="/create-quiz" element={<CreateQuiz />} />
             <Route path="/join-quiz" element={<JoinQuiz />} />
             <Route path="/quiz/:quizId" element={<TakeQuiz />} />
+            <Route path="/my-quizzes" element={<MyQuizzes />} />
             <Route path="/quiz/:quizId/results" element={<QuizResults />} /> {/* New route for results */}
             <Route path="/articles" element={<Articles />} />
             <Route path="/edit-article/:articleId" element={<EditArticle />} /> {/* New Edit Route */}
