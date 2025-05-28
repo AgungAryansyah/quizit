@@ -53,3 +53,20 @@ func (h *Handler) SearchArticles(ctx *fiber.Ctx) error {
 
 	return response.HttpSuccess(ctx, "success", articles)
 }
+
+func (h *Handler) GetUserArticles(ctx *fiber.Ctx) error {
+	userId, ok := ctx.Locals("userId").(uuid.UUID)
+	if !ok {
+		return &response.Unauthorized
+	}
+
+	page := ctx.QueryInt("page", 1)
+	pageSize := ctx.QueryInt("size", 9)
+
+	articles, err := h.service.ArticleServie.GetUserArticles(userId, page, pageSize)
+	if err != nil {
+		return err
+	}
+
+	return response.HttpSuccess(ctx, "success", articles)
+}
