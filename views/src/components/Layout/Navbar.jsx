@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react" // useEffect is imported but not used, can be removed if not needed later
+import { useState, useEffect } from "react" 
 import { Link, useNavigate } from "react-router-dom"
-import { useAuth } from "../../contexts/AuthContext" // Ensure this path is correct
+import { useAuth } from "../../contexts/AuthContext" 
 import { User, LogOut, Menu, X } from "lucide-react"
-import Button from "../UI/Button" // Ensure this path is correct
+import Button from "../UI/Button" 
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth()
@@ -13,15 +13,14 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout()
-    navigate("/") // Navigate to home after logout
-    setIsMenuOpen(false) // Close menu on logout
+    navigate("/") 
+    setIsMenuOpen(false) 
   }
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
   }
 
-  // Close menu when a navigation link is clicked in mobile view
   const handleMobileLinkClick = () => {
     setIsMenuOpen(false);
   }
@@ -32,7 +31,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2" onClick={isMenuOpen ? handleMobileLinkClick : undefined}>
-            <div className="w-8 h-8 bg-primary-600 rounded"></div> {/* Placeholder for logo icon */}
+            <div className="w-8 h-8 bg-primary-600 rounded"></div> 
             <span className="text-xl font-bold text-gray-900">Quizit</span>
           </Link>
 
@@ -43,7 +42,6 @@ const Navbar = () => {
                 <Link to="/articles" className="text-gray-700 hover:text-primary-600 font-medium">
                   Read Article
                 </Link>
-                {/* Changed "Create Quiz" to "Find Quiz" and updated link */}
                 <Link to="/quizzes" className="text-gray-700 hover:text-primary-600 font-medium">
                   Find Quiz
                 </Link>
@@ -112,7 +110,6 @@ const Navbar = () => {
                   <Link to="/articles" onClick={handleMobileLinkClick} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50">
                     Read Article
                   </Link>
-                  {/* Changed "Create Quiz" to "Find Quiz" and updated link */}
                   <Link to="/quizzes" onClick={handleMobileLinkClick} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50">
                     Find Quiz
                   </Link>
@@ -123,7 +120,7 @@ const Navbar = () => {
                     Dashboard
                   </Link>
                   <button
-                    onClick={handleLogout} // handleLogout already includes setIsMenuOpen(false)
+                    onClick={handleLogout} 
                     className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50"
                   >
                     Logout

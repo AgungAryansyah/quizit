@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import api from "../../config/api" // Ensure this path is correct
-import Card from "../../components/UI/Card" // Ensure this path is correct
-import Button from "../../components/UI/Button" // Ensure this path is correct
-import { ArrowLeft, Calendar, User } from "lucide-react" // Re-added User icon
+import api from "../../config/api" 
+import Card from "../../components/UI/Card" 
+import Button from "../../components/UI/Button" 
+import { ArrowLeft, Calendar, User } from "lucide-react" 
 
 const ArticleDetail = () => {
   const { articleId } = useParams()
@@ -21,12 +21,11 @@ const ArticleDetail = () => {
     setLoading(true);
     try {
       const response = await api.get(`/articles/${articleId}`)
-      // Backend response example: { message: "success", payload: [{ user_name: "agung", title: "...", text: "..." }] }
       if (response.data && response.data.payload && Array.isArray(response.data.payload) && response.data.payload.length > 0) {
         const rawArticle = response.data.payload[0];
         setArticle({
-          ...rawArticle, // This will include user_name, title, text, id, created_at (if sent by backend)
-          content: rawArticle.text || "", // Map backend 'text' to frontend 'content'
+          ...rawArticle, 
+          content: rawArticle.text || "", 
         });
       } else {
         console.error("Article data not found in expected format:", response.data);

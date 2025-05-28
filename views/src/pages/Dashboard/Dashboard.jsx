@@ -1,4 +1,3 @@
-// src/pages/Dashboard.jsx
 "use client"
 
 import { useState, useEffect } from "react"
@@ -126,7 +125,6 @@ const Dashboard = () => {
                     <div key={quiz.id} className="flex items-center justify-between p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
                       <div>
                         <h3 className="font-medium text-gray-900">{quiz.title}</h3>
-                        {/* Question count removed here */}
                         <p className="text-sm text-gray-600">Code: {quiz.quiz_code}</p>
                       </div>
                       {quiz.created_at && (<span className="text-xs text-gray-500 flex-shrink-0 ml-2">{new Date(quiz.created_at).toLocaleDateString()}</span>)}
@@ -158,7 +156,6 @@ const Dashboard = () => {
             <Card>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-gray-900 flex items-center"><CheckCircle size={22} className="mr-2 text-green-600"/>My Quiz Attempts</h2>
-                {/* This link should point to the new MyAttempts page */}
                 <Link to="/my-attempts" className="text-green-600 hover:text-green-500 text-sm font-medium">View All</Link>
               </div>
               <div className="space-y-3">

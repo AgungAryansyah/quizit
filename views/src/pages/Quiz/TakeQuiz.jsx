@@ -1,4 +1,3 @@
-// src/pages/Quiz/TakeQuiz.jsx
 "use client"
 
 import { useState, useEffect } from "react"
@@ -15,9 +14,6 @@ const TakeQuiz = () => {
   const [answers, setAnswers] = useState({})
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
-  // Removed showResults and results state, as we navigate to a new page
-  // const [showResults, setShowResults] = useState(false) 
-  // const [results, setResults] = useState(null)
 
   useEffect(() => {
     fetchQuizDetails();
@@ -62,27 +58,24 @@ const TakeQuiz = () => {
   const handleSubmitQuiz = async () => {
     setSubmitting(true);
     const payload = {
-      quiz_id: quizId, 
-      answers: answers, 
+      quiz_id: quizId,
+      answers: answers,
     };
 
     try {
       const response = await api.post(`/attempts`, payload);
       if (response.data && response.data.payload && Array.isArray(response.data.payload) && response.data.payload.length > 0) {
         const attemptResult = response.data.payload[0];
-        // Navigate to the new QuizResults page with necessary data
-        navigate(`/quiz/${quizId}/results`, { 
-          state: { 
+        navigate(`/quiz/${quizId}/results`, {
+          state: {
             results: attemptResult,
-            quizTitle: quiz?.title || "Quiz", // Pass the quiz title
-            totalQuestions: quiz?.questions?.length || 0 // Pass total number of questions
-          } 
+            quizTitle: quiz?.title || "Quiz",
+            totalQuestions: quiz?.questions?.length || 0
+          }
         });
       } else {
         throw new Error("Invalid response structure after submitting quiz.");
       }
-      // No longer setting local state for results or showing them here
-      // setShowResults(true); 
     } catch (error) {
       console.error("Error submitting quiz:", error);
       alert(error.response?.data?.message || error.message || "Failed to submit quiz. Please try again.");
@@ -91,11 +84,7 @@ const TakeQuiz = () => {
     }
   };
 
-  // The results display section previously here is now removed,
-  // as we navigate to QuizResults.jsx
-
   if (loading) {
-    // ... (loading JSX remains the same)
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
@@ -104,7 +93,6 @@ const TakeQuiz = () => {
   }
 
   if (!quiz) {
-    // ... (quiz not found JSX remains the same)
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card>
@@ -117,9 +105,8 @@ const TakeQuiz = () => {
       </div>
     );
   }
-  
+
   if (!quiz.questions || quiz.questions.length === 0) {
-    // ... (empty quiz JSX remains the same)
      return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card>
@@ -133,8 +120,6 @@ const TakeQuiz = () => {
     );
   }
 
-  // ... (rest of the quiz taking JSX: currentQuestionData, progress, rendering question, options, and nav buttons) ...
-  // This part remains the same as before
   const currentQuestionData = quiz.questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
 
@@ -162,7 +147,7 @@ const TakeQuiz = () => {
 
         <Card className="mb-6">
           <h2 className="text-xl font-bold text-gray-900 mb-6">{currentQuestionData.text}</h2>
-          
+
           <div className="space-y-3">
             {currentQuestionData.options.map((option) => (
               <button
@@ -177,8 +162,8 @@ const TakeQuiz = () => {
                 <div className="flex items-center space-x-3">
                   <div
                     className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
-                      answers[currentQuestionData.id] === option.id 
-                        ? "border-primary-600 bg-primary-600" 
+                      answers[currentQuestionData.id] === option.id
+                        ? "border-primary-600 bg-primary-600"
                         : "border-gray-400"
                     }`}
                   >

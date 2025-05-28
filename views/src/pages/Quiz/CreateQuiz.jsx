@@ -2,23 +2,23 @@
 
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import api from "../../config/api" // Assuming this path and API utility are correct
-import Card from "../../components/UI/Card" // Assuming this component exists and works as before
-import Button from "../../components/UI/Button" // Assuming this component exists and works as before
-import Input from "../../components/UI/Input" // Assuming this component exists and works as before
+import api from "../../config/api"
+import Card from "../../components/UI/Card"
+import Button from "../../components/UI/Button"
+import Input from "../../components/UI/Input"
 import { Plus, Trash2 } from "lucide-react"
 
 const CreateQuiz = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [quiz, setQuiz] = useState({
-    theme: "", // Changed from description
+    theme: "",
     title: "",
     questions: [
       {
-        score: 10, // Added score
-        text: "", // Changed from question
-        options: [ // Options are now objects
+        score: 10,
+        text: "",
+        options: [
           { text: "", is_correct: true },
           { text: "", is_correct: false },
         ],
@@ -26,7 +26,6 @@ const CreateQuiz = () => {
     ],
   })
 
-  // Handles changes to top-level quiz fields like title and theme
   const handleQuizInfoChange = (field, value) => {
     setQuiz((prevQuiz) => ({
       ...prevQuiz,
@@ -34,7 +33,6 @@ const CreateQuiz = () => {
     }))
   }
 
-  // Handles changes to question text or score
   const handleQuestionDetailChange = (questionIndex, field, value) => {
     const updatedQuestions = quiz.questions.map((q, index) => {
       if (index === questionIndex) {
@@ -48,7 +46,6 @@ const CreateQuiz = () => {
     }))
   }
 
-  // Handles changes to an option's text
   const handleOptionTextChange = (questionIndex, optionIndex, value) => {
     const updatedQuestions = [...quiz.questions]
     updatedQuestions[questionIndex].options[optionIndex].text = value
@@ -58,7 +55,6 @@ const CreateQuiz = () => {
     })
   }
 
-  // Handles changing the correct answer for a question
   const handleCorrectOptionChange = (questionIndex, correctOptionIndex) => {
     const updatedQuestions = quiz.questions.map((q, index) => {
       if (index === questionIndex) {
@@ -84,9 +80,9 @@ const CreateQuiz = () => {
       questions: [
         ...quiz.questions,
         {
-          score: 5, // Default score for new question
+          score: 5,
           text: "",
-          options: [ // Default options for new question
+          options: [
             { text: "", is_correct: true },
             { text: "", is_correct: false },
           ],
@@ -106,19 +102,11 @@ const CreateQuiz = () => {
       })
     }
   }
-  
-  // Placeholder: You might need a way to add/remove options within a question.
-  // For now, this example assumes a fixed number of options per question once added,
-  // or you manage it by editing the initial options. The example JSON has varying numbers.
-  // If you need to dynamically add/remove options for a specific question,
-  // new handler functions (e.g., `addOptionToQuestion`, `removeOptionFromQuestion`) would be needed.
-
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
 
-    // Validate that each question has at least one correct answer
     for (const question of quiz.questions) {
         if (!question.options.some(opt => opt.is_correct)) {
             alert(`Question "${question.text || 'Untitled Question'}" must have one correct answer selected.`);
@@ -128,12 +116,10 @@ const CreateQuiz = () => {
     }
 
     try {
-      // The 'quiz' state should now match the desired JSON structure
       const response = await api.post("/quizzes", quiz)
       navigate("/dashboard")
     } catch (error) {
       console.error("Error creating quiz:", error)
-      // It's good practice to show more specific error messages if the API provides them
       const errorMessage = error.response?.data?.message || "Failed to create quiz. Please try again."
       alert(errorMessage)
     } finally {
@@ -164,7 +150,6 @@ const CreateQuiz = () => {
                 placeholder="Enter quiz title"
                 required
               />
-              {/* Changed from Description to Theme */}
               <Input
                 label="Quiz Theme"
                 value={quiz.theme}
@@ -175,7 +160,6 @@ const CreateQuiz = () => {
             </div>
           </Card>
 
-          {/* Questions */}
           {quiz.questions.map((question, questionIndex) => (
             <Card key={questionIndex} className="mb-6">
               <div className="flex items-center justify-between mb-4">
@@ -197,7 +181,7 @@ const CreateQuiz = () => {
               <div className="space-y-4">
                 <Input
                   label="Question Text"
-                  value={question.text} // Changed from question.question
+                  value={question.text}
                   onChange={(e) =>
                     handleQuestionDetailChange(questionIndex, "text", e.target.value)
                   }
@@ -207,7 +191,7 @@ const CreateQuiz = () => {
                 <Input
                   label="Score"
                   type="number"
-                  value={question.score} // Added score field
+                  value={question.score}
                   onChange={(e) =>
                     handleQuestionDetailChange(questionIndex, "score", e.target.value)
                   }
@@ -228,15 +212,15 @@ const CreateQuiz = () => {
                       >
                         <input
                           type="radio"
-                          name={`correct-option-${questionIndex}`} // Ensure unique name per question for radio group
-                          checked={option.is_correct} // Check based on is_correct flag
+                          name={`correct-option-${questionIndex}`}
+                          checked={option.is_correct}
                           onChange={() =>
                             handleCorrectOptionChange(questionIndex, optionIndex)
                           }
                           className="text-primary-600 h-4 w-4"
                         />
                         <Input
-                          value={option.text} // Bind to option.text
+                          value={option.text}
                           onChange={(e) =>
                             handleOptionTextChange(
                               questionIndex,
@@ -254,11 +238,6 @@ const CreateQuiz = () => {
                   <p className="text-sm text-gray-500 mt-1">
                     Select the radio button next to the correct answer.
                   </p>
-                  {/* Consider adding buttons here to add/remove options for this specific question 
-                    if that's a desired feature. For example:
-                    <Button type="button" onClick={() => addOptionToQuestion(questionIndex)}>Add Option</Button>
-                    (This would require new state logic and handlers)
-                  */}
                 </div>
               </div>
             </Card>

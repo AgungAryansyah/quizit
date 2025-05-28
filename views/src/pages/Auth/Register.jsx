@@ -2,8 +2,8 @@
 "use client"
 
 import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom" // Ensure useNavigate is imported
-import { useAuth } from "../../contexts/AuthContext" // Ensure correct path
+import { Link, useNavigate } from "react-router-dom" 
+import { useAuth } from "../../contexts/AuthContext" 
 import Button from "../../components/UI/Button"
 import Input from "../../components/UI/Input"
 import Card from "../../components/UI/Card"
@@ -70,7 +70,6 @@ const Register = () => {
     const result = await register(formData.name, formData.email, formData.password)
 
     if (result.success) {
-      // Redirect to the login page with an optional success message
       navigate("/login", { 
         state: { message: "Registration successful! Please log in." } 
       });

@@ -1,4 +1,3 @@
-// contexts/AuthContext.jsx
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
@@ -33,7 +32,6 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem("user");
       return null;
     } catch (error) {
-      // This catch handles API errors (e.g., 401 if no valid session, network errors)
       setUser(null);
       localStorage.removeItem("user");
       localStorage.removeItem("authToken");
@@ -47,7 +45,7 @@ export const AuthProvider = ({ children }) => {
         await fetchCurrentUser();
       } catch (e) {
         console.error("AuthContext: Critical error during initializeAuth's call to fetchCurrentUser:", e);
-        setUser(null); // Ensure user is null
+        setUser(null); 
         localStorage.removeItem("user");
         localStorage.removeItem("authToken");
       } finally {
@@ -56,7 +54,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     initializeAuth();
-  }, []); // Empty dependency array: runs once on AuthProvider mount
+  }, []); 
 
   const login = async (email, password) => {
     setLoading(true);

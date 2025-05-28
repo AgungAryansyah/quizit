@@ -1,13 +1,12 @@
-// src/pages/Quiz/MyQuizzes.jsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext"; // Adjust path as needed
-import api from "../../config/api"; // Adjust path as needed
-import Card from "../../components/UI/Card"; // Adjust path as needed
-import Button from "../../components/UI/Button"; // Adjust path as needed
-import { Plus, FileText, CalendarCheck, Hash, ChevronLeft, ChevronRight, Trash2, PlayCircle } from "lucide-react"; // Added necessary icons
+import { useAuth } from "../../contexts/AuthContext";
+import api from "../../config/api";
+import Card from "../../components/UI/Card";
+import Button from "../../components/UI/Button";
+import { Plus, FileText, CalendarCheck, Hash, ChevronLeft, ChevronRight, Trash2, PlayCircle } from "lucide-react";
 
 const MyQuizzes = () => {
   const { user, loading: authLoading } = useAuth();
@@ -17,8 +16,8 @@ const MyQuizzes = () => {
   const [pageLoading, setPageLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLastPage, setIsLastPage] = useState(false);
-  const quizzesPerPage = 6; // Or your preferred number
-  const [actionLoading, setActionLoading] = useState(null); // For delete button loading state
+  const quizzesPerPage = 6;
+  const [actionLoading, setActionLoading] = useState(null);
 
   useEffect(() => {
     if (!authLoading && user?.user_id) {
@@ -39,11 +38,9 @@ const MyQuizzes = () => {
     }
     setPageLoading(true);
     try {
-      // Assumes backend endpoint /quizzes/users/:userId for user's quizzes
       const response = await api.get(
         `/quizzes/users/${userId}?page=${page}&size=${quizzesPerPage}`
       );
-      
       const rawQuizzes = response.data.payload?.[0] || [];
       setQuizzes(rawQuizzes);
       setIsLastPage(rawQuizzes.length < quizzesPerPage);
@@ -70,12 +67,11 @@ const MyQuizzes = () => {
     if (window.confirm("Are you sure you want to delete this quiz? This action cannot be undone.")) {
       setActionLoading(quizIdToDelete);
       try {
-        // Assumes backend endpoint DELETE /quizzes/:quizId
         await api.delete(`/quizzes/${quizIdToDelete}`);
         if (quizzes.length === 1 && currentPage > 1) {
-          setCurrentPage(currentPage - 1); // Will trigger refetch via useEffect
+          setCurrentPage(currentPage - 1);
         } else {
-          fetchUserQuizzes(currentPage, user.user_id); // Refetch current page
+          fetchUserQuizzes(currentPage, user.user_id);
         }
       } catch (error) {
         console.error("Error deleting quiz:", error);
@@ -123,8 +119,6 @@ const MyQuizzes = () => {
           </Link>
         </div>
 
-        {/* Search Bar Removed */}
-
         {pageLoading && quizzes.length > 0 && (
           <div className="text-center py-10">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 mx-auto"></div>
@@ -145,9 +139,6 @@ const MyQuizzes = () => {
                     {quiz.quiz_code && (
                       <p className="text-sm text-gray-500 font-mono">Code: {quiz.quiz_code}</p>
                     )}
-                    {/* Display number of questions if available, otherwise omit */}
-                    {/* quiz.questions is not in the provided API response for list of quizzes */}
-                    {/* <p className="text-sm text-gray-600">{quiz.questions?.length || 0} questions</p> */}
                   </div>
                   <div className="flex items-center justify-end text-sm text-gray-500 mb-3 pt-2 border-t border-gray-100">
                     {quiz.created_at && (
@@ -159,9 +150,9 @@ const MyQuizzes = () => {
                   </div>
                 </div>
                 <div className="mt-auto space-y-2">
-                  <Button 
+                  <Button
                     className="w-full flex items-center justify-center"
-                    onClick={() => navigate(`/quiz/${quiz.id}`)} // Navigate to TakeQuiz page
+                    onClick={() => navigate(`/quiz/${quiz.id}`)}
                   >
                     <PlayCircle size={18} className="mr-2"/> Take Quiz
                   </Button>
