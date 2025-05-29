@@ -1,6 +1,6 @@
 # Quizit
 
-This guide will help you set up and run the Quizit application using Docker and Docker Compose.
+Quizit is a web app made as a final project for a web app development class in university.
 
 ## Prerequisites
 
