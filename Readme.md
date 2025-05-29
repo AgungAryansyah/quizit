@@ -35,7 +35,7 @@ a. Navigate to the root directory of the project (where docker-compose.yml is lo
 b. Build and start the services:
 
 ```bash
-docker-compose up --build -d
+docker-compose up --build
 ```
 
 c. Wait for services to start
