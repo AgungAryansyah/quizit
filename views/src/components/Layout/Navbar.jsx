@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../../contexts/AuthContext" 
 import { User, LogOut, Menu, X } from "lucide-react"
 import Button from "../UI/Button" 
+import quizitLogo from "../../assets/quizit_logo.png";
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth()
@@ -31,7 +32,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2" onClick={isMenuOpen ? handleMobileLinkClick : undefined}>
-            <div className="w-8 h-8 bg-primary-600 rounded"></div> 
+            <img src={quizitLogo} alt="Quizit Logo" className="w-8 h-8" /> 
             <span className="text-xl font-bold text-gray-900">Quizit</span>
           </Link>
 
