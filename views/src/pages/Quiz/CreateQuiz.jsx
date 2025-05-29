@@ -12,7 +12,7 @@ const CreateQuiz = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [quiz, setQuiz] = useState({
-    theme: "",
+    theme: "", // Assuming theme was intended from your first refactor example
     title: "",
     questions: [
       {
@@ -82,7 +82,7 @@ const CreateQuiz = () => {
         {
           score: 5,
           text: "",
-          options: [
+          options: [ // New questions still default to 2 options
             { text: "", is_correct: true },
             { text: "", is_correct: false },
           ],
@@ -103,20 +103,77 @@ const CreateQuiz = () => {
     }
   }
 
+  // Handler to add a new option to a specific question
+  const handleAddOptionToQuestion = (questionIndex) => {
+    const updatedQuestions = quiz.questions.map((q, index) => {
+      if (index === questionIndex) {
+        // Add a new blank, incorrect option. Max 6 options for example.
+        if (q.options.length >= 6) { 
+            alert("Maximum of 6 options per question reached.");
+            return q;
+        }
+        return {
+          ...q,
+          options: [...q.options, { text: "", is_correct: false }],
+        };
+      }
+      return q;
+    });
+    setQuiz(prevQuiz => ({ ...prevQuiz, questions: updatedQuestions }));
+  };
+
+  // Handler to remove an option from a specific question
+  const handleRemoveOptionFromQuestion = (questionIndex, optionIndexToRemove) => {
+    const updatedQuestions = [...quiz.questions];
+    const questionToUpdate = updatedQuestions[questionIndex];
+
+    if (questionToUpdate.options.length <= 2) { // Minimum 2 options
+      alert("A question must have at least two options.");
+      return; // Do not proceed with removal
+    }
+
+    const removedOptionWasCorrect = questionToUpdate.options[optionIndexToRemove].is_correct;
+    
+    // Filter out the option
+    questionToUpdate.options = questionToUpdate.options.filter((_, optIdx) => optIdx !== optionIndexToRemove);
+
+    // If the removed option was the correct one, or if no option is currently marked as correct
+    // after removal, ensure the first remaining option is set as correct.
+    const hasCorrectOptionNow = questionToUpdate.options.some(opt => opt.is_correct);
+
+    if ((removedOptionWasCorrect || !hasCorrectOptionNow) && questionToUpdate.options.length > 0) {
+      questionToUpdate.options = questionToUpdate.options.map((opt, idx) => ({
+        ...opt,
+        is_correct: idx === 0, // Make the new first option correct
+      }));
+    }
+    
+    setQuiz(prevQuiz => ({ ...prevQuiz, questions: updatedQuestions }));
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
 
     for (const question of quiz.questions) {
         if (!question.options.some(opt => opt.is_correct)) {
-            alert(`Question "${question.text || 'Untitled Question'}" must have one correct answer selected.`);
+            alert(`Question "${question.text || `Question ${quiz.questions.indexOf(question) + 1}`}" must have one correct answer selected.`);
             setLoading(false);
             return;
+        }
+        // Also ensure each option has text
+        for(const option of question.options){
+            if(!option.text.trim()){
+                alert(`All options for question "${question.text || `Question ${quiz.questions.indexOf(question) + 1}`}" must have text.`);
+                setLoading(false);
+                return;
+            }
         }
     }
 
     try {
-      const response = await api.post("/quizzes", quiz)
+      const response = await api.post("/quizzes", quiz) // Assumes API handles the quiz structure
       navigate("/dashboard")
     } catch (error) {
       console.error("Error creating quiz:", error)
@@ -151,10 +208,10 @@ const CreateQuiz = () => {
                 required
               />
               <Input
-                label="Quiz Theme"
+                label="Quiz Theme" // Changed from Description to Theme based on first request
                 value={quiz.theme}
                 onChange={(e) => handleQuizInfoChange("theme", e.target.value)}
-                placeholder="e.g., Science, History, Space Exploration"
+                placeholder="e.g., Science, History"
                 required
               />
             </div>
@@ -170,6 +227,7 @@ const CreateQuiz = () => {
                   <Button
                     type="button"
                     variant="ghost"
+                    size="icon"
                     onClick={() => removeQuestion(questionIndex)}
                     className="text-red-600 hover:text-red-700"
                   >
@@ -202,13 +260,13 @@ const CreateQuiz = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Answer Options
+                    Answer Options ({question.options.length})
                   </label>
                   <div className="space-y-2">
                     {question.options.map((option, optionIndex) => (
                       <div
-                        key={optionIndex}
-                        className="flex items-center space-x-3"
+                        key={optionIndex} // For dynamic lists, a more stable key like option.id (if you generate one) is better, but index is okay for this.
+                        className="flex items-center space-x-3 group"
                       >
                         <input
                           type="radio"
@@ -217,7 +275,7 @@ const CreateQuiz = () => {
                           onChange={() =>
                             handleCorrectOptionChange(questionIndex, optionIndex)
                           }
-                          className="text-primary-600 h-4 w-4"
+                          className="text-primary-600 h-4 w-4 flex-shrink-0"
                         />
                         <Input
                           value={option.text}
@@ -232,11 +290,33 @@ const CreateQuiz = () => {
                           className="flex-1"
                           required
                         />
+                        {question.options.length > 2 && ( // Show remove button only if more than 2 options
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleRemoveOptionFromQuestion(questionIndex, optionIndex)}
+                            className="text-gray-400 hover:text-red-600 opacity-50 group-hover:opacity-100"
+                            title="Remove option"
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        )}
                       </div>
                     ))}
                   </div>
+                  <Button
+                    type="button"
+                    variant="link"
+                    size="sm"
+                    onClick={() => handleAddOptionToQuestion(questionIndex)}
+                    className="mt-2 text-primary-600 hover:text-primary-700"
+                    disabled={question.options.length >= 6} // Example: Max 6 options
+                  >
+                    <Plus size={16} className="mr-1" /> Add Option
+                  </Button>
                   <p className="text-sm text-gray-500 mt-1">
-                    Select the radio button next to the correct answer.
+                    Select the radio button next to the correct answer. Min 2, Max 6 options.
                   </p>
                 </div>
               </div>
