@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS attempts (
     id UUID PRIMARY KEY, 
     user_id UUID NOT NULL,
     quiz_id UUID NOT NULL,
-    total_score INTEGER NOT NULL CHECK (total_score > 0),
+    total_score INTEGER NOT NULL CHECK (total_score >= 0),
     finished_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE
