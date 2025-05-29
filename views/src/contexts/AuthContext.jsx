@@ -15,7 +15,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); 
 
   const fetchCurrentUser = async () => {
     try {
@@ -40,20 +40,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        await fetchCurrentUser();
-      } catch (e) {
-        console.error("AuthContext: Critical error during initializeAuth's call to fetchCurrentUser:", e);
-        setUser(null); 
-        localStorage.removeItem("user");
-        localStorage.removeItem("authToken");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initializeAuth();
+    setUser(null);
+    setLoading(false); 
   }, []); 
 
   const login = async (email, password) => {
@@ -62,13 +50,15 @@ export const AuthProvider = ({ children }) => {
       await api.post("/auths/login", { email, password }, {
         withCredentials: true,
       });
+      
       const loggedInUser = await fetchCurrentUser(); 
+      
       if (!loggedInUser) {
-        throw new Error("Login succeeded but failed to fetch user details from /users.");
+        throw new Error("Login credentials were correct, but failed to retrieve user details afterwards.");
       }
-      return { success: true };
+      return { success: true }; 
     } catch (error) {
-      setUser(null);
+      setUser(null); 
       return {
         success: false,
         error: error.response?.data?.message || error.message || "Login failed.",
