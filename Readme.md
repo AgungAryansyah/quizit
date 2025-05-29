@@ -15,8 +15,8 @@ This guide will help you set up and run the Quizit application using Docker and 
 Open your terminal and run the following command to clone the repository to your local machine:
 
 ```bash
-git clone <repository_url>
-cd <repository_folder_name>
+git clone https://github.com/AgungAryansyah/quizit.git
+cd quizit
 ```
 
 ### 2. Set Up Environment Variables
