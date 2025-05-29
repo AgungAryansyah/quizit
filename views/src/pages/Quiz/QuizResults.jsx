@@ -2,8 +2,8 @@
 
 import { useLocation, useNavigate, useParams, Link } from "react-router-dom";
 import { useEffect } from "react";
-import Card from "../../components/UI/Card";
-import Button from "../../components/UI/Button";
+import Card from "../../components/UI/Card"; // Ensure this path is correct
+import Button from "../../components/UI/Button"; // Ensure this path is correct
 
 const QuizResults = () => {
   const navigate = useNavigate();
@@ -14,7 +14,6 @@ const QuizResults = () => {
 
   useEffect(() => {
     if (!results) {
-      console.warn("QuizResults: No results found in location state. Redirecting...");
       navigate(quizIdFromParams ? `/quiz/${quizIdFromParams}` : "/dashboard");
     }
   }, [results, navigate, quizIdFromParams]);
@@ -56,13 +55,21 @@ const QuizResults = () => {
             )}
           </div>
 
-          <div className="space-y-4 mt-8">
+          {/* Buttons now side-by-side with horizontal spacing */}
+          <div className="flex flex-col sm:flex-row sm:justify-center sm:space-x-4 space-y-4 sm:space-y-0 mt-8">
             {quizIdForRetake && (
-              <Button onClick={() => navigate(`/quiz/${quizIdForRetake}`)}>
+              <Button 
+                onClick={() => navigate(`/quiz/${quizIdForRetake}`)}
+                className="w-full sm:w-auto" // Allow buttons to take natural width or be full on small screens
+              >
                 Try Quiz Again
               </Button>
             )}
-            <Button variant="outline" onClick={() => navigate("/dashboard")}>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate("/dashboard")}
+              className="w-full sm:w-auto" // Allow buttons to take natural width or be full on small screens
+            >
               Go to Dashboard
             </Button>
           </div>
