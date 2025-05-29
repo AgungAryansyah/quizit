@@ -1,6 +1,6 @@
 # Quizit
 
-Quizit is a web app made as a final project for a web app development class in university.
+Quizit is a educational web app made as a final project for a web app development class in university.
 
 ## Prerequisites
 
