@@ -10,6 +10,7 @@ import (
 	"quizit-be/pkg/middleware"
 	"quizit-be/pkg/postgres"
 	"quizit-be/pkg/routes"
+	"quizit-be/pkg/validator"
 )
 
 func main() {
@@ -27,10 +28,11 @@ func main() {
 
 	jwt := jwt.NewJwt(*env)
 	middleware := middleware.NewMiddleware(jwt)
+	validator := validator.NewValidator()
 
 	repository := repository.NewRepository(db)
 	service := service.NewService(repository, &jwt)
-	handler := rest.NewHandler(service, middleware, env)
+	handler := rest.NewHandler(service, middleware, env, validator)
 
 	route := routes.NewRoute(app, *handler, middleware)
 	if err := route.RegisterRoutes(env.APP_PORT); err != nil {
