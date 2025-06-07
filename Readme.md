@@ -2,6 +2,10 @@
 
 Quizit is a educational web app made as a final project for a web app development class in university.
 
+## **Submitted Code**
+
+If you wanted to check the state of the repo when it was submitted, you can visit the [submisson tag](https://github.com/AgungAryansyah/quizit/releases/tag/submission)
+
 ## Prerequisites
 
 * **Git:** You'll need Git installed to clone the repository.
