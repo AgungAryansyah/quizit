@@ -16,6 +16,10 @@ func (h *Handler) Register(ctx *fiber.Ctx) error {
 		return err
 	}
 
+	if err := h.validator.Struct(register); err != nil {
+		return err
+	}
+
 	if err := h.service.AuthService.Register(&register); err != nil {
 		return err
 	}
@@ -26,6 +30,10 @@ func (h *Handler) Register(ctx *fiber.Ctx) error {
 func (h *Handler) Login(ctx *fiber.Ctx) error {
 	var login dto.LoginReq
 	if err := ctx.BodyParser(&login); err != nil {
+		return err
+	}
+
+	if err := h.validator.Struct(login); err != nil {
 		return err
 	}
 
