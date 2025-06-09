@@ -34,20 +34,20 @@ type OptionDto struct {
 }
 
 type CreateQuiz struct {
-	Theme     string                      `json:"theme"`
-	Title     string                      `json:"title"`
-	Questions []CreateQuestionWithOptions `json:"questions"`
+	Theme     string           `json:"theme" validate:"required"`
+	Title     string           `json:"title" validate:"required"`
+	Questions []CreateQuestion `json:"questions" validate:"required,min=2,max=100,dive"`
 }
 
-type CreateQuestionWithOptions struct {
-	Score   int            `json:"score"`
-	Text    string         `json:"text"`
-	Options []CreateOption `json:"options"`
+type CreateQuestion struct {
+	Score   int            `json:"score" validate:"required,min=1,max=100"`
+	Text    string         `json:"text" validate:"required"`
+	Options []CreateOption `json:"options" validate:"required,min=2,max=5,dive"`
 }
 
 type CreateOption struct {
 	IsCorrect bool   `json:"is_correct"`
-	Text      string `json:"text"`
+	Text      string `json:"text" validate:"required"`
 }
 
 type CreateQuizRes struct {
