@@ -46,6 +46,10 @@ func (h *Handler) CreateQuiz(ctx *fiber.Ctx) error {
 		return &response.BadRequest
 	}
 
+	if err := h.validator.Struct(createQuiz); err != nil {
+		return err
+	}
+
 	res, err := h.service.QuizService.CreateQuiz(&createQuiz, userId)
 	if err != nil {
 		return err
