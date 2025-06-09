@@ -3,8 +3,8 @@ package dto
 import "github.com/google/uuid"
 
 type CreateArticle struct {
-	Title string `json:"title"`
-	Text  string `json:"text"`
+	Title string `json:"title" validate:"required"`
+	Text  string `json:"text" validate:"required"`
 }
 
 type ArticleDto struct {
@@ -14,7 +14,7 @@ type ArticleDto struct {
 }
 
 type EditArticle struct {
-	Id    uuid.UUID `json:"id"`
-	Title string    `json:"title"`
-	Text  string    `json:"text"`
+	Id    uuid.UUID `json:"id" validate:"required,uuid"`
+	Title string    `json:"title" validate:"required"`
+	Text  string    `json:"text" validate:"required"`
 }

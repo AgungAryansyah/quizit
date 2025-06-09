@@ -33,6 +33,10 @@ func (h *Handler) CreateArticle(ctx *fiber.Ctx) error {
 		return &response.Unauthorized
 	}
 
+	if err := h.validator.Struct(create); err != nil {
+		return err
+	}
+
 	articleId, err := h.service.ArticleServie.CreateArticle(&create, userId)
 	if err != nil {
 		return err
@@ -99,6 +103,10 @@ func (h *Handler) EditArticle(ctx *fiber.Ctx) error {
 	var edit dto.EditArticle
 	if err := ctx.BodyParser(&edit); err != nil {
 		return &response.Unauthorized
+	}
+
+	if err := h.validator.Struct(edit); err != nil {
+		return err
 	}
 
 	err := h.service.ArticleServie.EditArticle(&edit, userId)
