@@ -2,7 +2,7 @@ package dto
 
 type HttpSuccess struct {
 	Message string `json:"message" example:"Succes"`
-	Payload any    `json:"payload" example:"{\"id\": 1, \"name\": \"John Doe\"}"`
+	Payload any    `json:"payload"`
 }
 
 type HttpError struct {

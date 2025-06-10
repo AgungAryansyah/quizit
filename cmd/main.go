@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "quizit-be/docs"
 	"quizit-be/internal/handler/rest"
 	"quizit-be/internal/repository"
 	"quizit-be/internal/service"
@@ -13,6 +14,10 @@ import (
 	"quizit-be/pkg/validator"
 )
 
+// @title Quizit
+// @version 1.0
+// @host localhost:8081
+// @basePath /api/v1
 func main() {
 	env, err := env.Load()
 	if err != nil {

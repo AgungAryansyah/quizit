@@ -1,0 +1,70 @@
+basePath: /api/v1
+definitions:
+  dto.HttpSuccess:
+    properties:
+      message:
+        example: Succes
+        type: string
+      payload: {}
+    type: object
+  dto.Register:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      name:
+        example: user
+        minLength: 6
+        type: string
+      password:
+        example: Strong_Password123
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+  response.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      error: {}
+    type: object
+host: localhost:8081
+info:
+  contact: {}
+  title: Quizit
+  version: "1.0"
+paths:
+  /auths/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Register req body
+        in: body
+        name: registerReq
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Register'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "409":
+          description: User already exist
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Create a new account
+swagger: "2.0"
