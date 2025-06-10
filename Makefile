@@ -17,3 +17,6 @@ up:
 
 down:
 	@GOOSE_DRIVER=postgres GOOSE_DBSTRING=$(DB_URL) goose -dir=db/migrations down
+
+swag:
+	@swag init -g cmd/main.go

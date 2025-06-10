@@ -5,6 +5,7 @@ import (
 	"quizit-be/pkg/middleware"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/swagger"
 )
 
 type Route struct {
@@ -29,6 +30,8 @@ func (r *Route) RegisterRoutes(port string) error {
 	mountAttempt(routerGroup, r.handler, r.middleware)
 	mountUser(routerGroup, r.handler, r.middleware)
 	mountArtice(routerGroup, r.handler, r.middleware)
+
+	r.app.Get("/swagger/*", swagger.HandlerDefault)
 
 	return r.app.Listen(":" + port)
 }

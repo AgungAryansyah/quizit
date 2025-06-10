@@ -10,6 +10,17 @@ import (
 	"github.com/google/uuid"
 )
 
+// @summary Create a new account
+// @description  Create a new user with the input payload
+// @tags Auth
+// @accept json
+// @produce json
+// @param registerReq body dto.Register true "Register req body"
+// @router /auths/register [post]
+// @success 200 {object} dto.HttpSuccess
+// @failure 400 {object} dto.HttpError "Validation error"
+// @failure 409 {object} dto.HttpError "User already exist"
+// @failure 500 {object} dto.HttpError "Internal Server error"
 func (h *Handler) Register(ctx *fiber.Ctx) error {
 	var register dto.Register
 	if err := ctx.BodyParser(&register); err != nil {
