@@ -16,6 +16,6 @@ func HttpSuccess(ctx *fiber.Ctx, msg string, payload ...any) error {
 func HttpError(ctx *fiber.Ctx, code int, msg string, err error) error {
 	return ctx.Status(code).JSON(dto.HttpError{
 		Message: msg,
-		Error:   err,
+		Error:   err.Error(),
 	})
 }

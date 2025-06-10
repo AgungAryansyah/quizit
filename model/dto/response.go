@@ -7,5 +7,5 @@ type HttpSuccess struct {
 
 type HttpError struct {
 	Message string `json:"messgae" example:"Invalid token"`
-	Error   error  `json:"error" example:"Article not found"`
+	Error   string `json:"error" example:"Article not found"`
 }

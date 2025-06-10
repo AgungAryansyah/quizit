@@ -17,11 +17,15 @@ const docTemplate = `{
     "paths": {
         "/auths/register": {
             "post": {
+                "description": "Create a new user with the input payload",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Auth"
                 ],
                 "summary": "Create a new account",
                 "parameters": [
@@ -45,19 +49,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
+                            "$ref": "#/definitions/dto.HttpError"
                         }
                     },
                     "409": {
                         "description": "User already exist",
                         "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
+                            "$ref": "#/definitions/dto.HttpError"
                         }
                     },
                     "500": {
                         "description": "Internal Server error",
                         "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
+                            "$ref": "#/definitions/dto.HttpError"
                         }
                     }
                 }
@@ -65,6 +69,19 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dto.HttpError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Article not found"
+                },
+                "messgae": {
+                    "type": "string",
+                    "example": "Invalid token"
+                }
+            }
+        },
         "dto.HttpSuccess": {
             "type": "object",
             "properties": {
@@ -90,21 +107,12 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "minLength": 6,
-                    "example": "user"
+                    "example": "new user"
                 },
                 "password": {
                     "type": "string",
                     "example": "Strong_Password123"
                 }
-            }
-        },
-        "response.ErrorResponse": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "integer"
-                },
-                "error": {}
             }
         }
     }

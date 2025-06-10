@@ -1,5 +1,14 @@
 basePath: /api/v1
 definitions:
+  dto.HttpError:
+    properties:
+      error:
+        example: Article not found
+        type: string
+      messgae:
+        example: Invalid token
+        type: string
+    type: object
   dto.HttpSuccess:
     properties:
       message:
@@ -13,7 +22,7 @@ definitions:
         example: user@example.com
         type: string
       name:
-        example: user
+        example: new user
         minLength: 6
         type: string
       password:
@@ -23,12 +32,6 @@ definitions:
     - email
     - name
     - password
-    type: object
-  response.ErrorResponse:
-    properties:
-      code:
-        type: integer
-      error: {}
     type: object
 host: localhost:8081
 info:
@@ -40,6 +43,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: Create a new user with the input payload
       parameters:
       - description: Register req body
         in: body
@@ -57,14 +61,16 @@ paths:
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/dto.HttpError'
         "409":
           description: User already exist
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/dto.HttpError'
         "500":
           description: Internal Server error
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/dto.HttpError'
       summary: Create a new account
+      tags:
+      - Auth
 swagger: "2.0"
