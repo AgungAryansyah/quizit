@@ -15,7 +15,7 @@ import (
 // @tags Auth
 // @accept json
 // @produce json
-// @param registerReq body dto.Register true "Register req body"
+// @param registerReq body dto.Register true "Register request body"
 // @router /auths/register [post]
 // @success 200 {object} dto.HttpSuccess
 // @failure 400 {object} dto.HttpError "Validation error"
@@ -38,6 +38,17 @@ func (h *Handler) Register(ctx *fiber.Ctx) error {
 	return response.HttpSuccess(ctx, "success", nil)
 }
 
+// @summary Logs into an account
+// @description Logs into an account with the input payload
+// @tags Auth
+// @accept json
+// @produce json
+// @param loginReq body dto.LoginReq true "Login request body"
+// @router /auths/login [post]
+// @success 200 {object} dto.HttpSuccess
+// @failure 400 {object} dto.HttpError "Validation error"
+// @failure 401 {object} dto.HttpError "Invalid credentials"
+// @failure 500 {object} dto.HttpError "Internal Server error"
 func (h *Handler) Login(ctx *fiber.Ctx) error {
 	var login dto.LoginReq
 	if err := ctx.BodyParser(&login); err != nil {
