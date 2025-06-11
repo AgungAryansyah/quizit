@@ -56,7 +56,6 @@ paths:
     post:
       consumes:
       - application/json
-      description: Logs into an account with the input payload
       parameters:
       - description: Login request body
         in: body
@@ -84,6 +83,26 @@ paths:
           schema:
             $ref: '#/definitions/dto.HttpError'
       summary: Logs into an account
+      tags:
+      - Auth
+  /auths/logout:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Logs user out by deleting the session and cookie
       tags:
       - Auth
   /auths/refresh:

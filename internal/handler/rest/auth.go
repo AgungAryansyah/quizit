@@ -39,7 +39,6 @@ func (h *Handler) Register(ctx *fiber.Ctx) error {
 }
 
 // @summary Logs into an account
-// @description Logs into an account with the input payload
 // @tags Auth
 // @accept json
 // @produce json
@@ -133,6 +132,13 @@ func (h *Handler) RefreshToken(ctx *fiber.Ctx) error {
 	return response.HttpSuccess(ctx, "success", nil)
 }
 
+// @summary Logs user out by deleting the session and cookie
+// @tags Auth
+// @produce json
+// @router /auths/logout [post]
+// @success 200 {object} dto.HttpSuccess
+// @failure 401 {object} dto.HttpError "Invalid credentials"
+// @failure 500 {object} dto.HttpError "Internal Server error"
 func (h *Handler) Logout(ctx *fiber.Ctx) error {
 	userId, ok := ctx.Locals("userId").(uuid.UUID)
 	if !ok {

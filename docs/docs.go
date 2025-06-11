@@ -17,7 +17,6 @@ const docTemplate = `{
     "paths": {
         "/auths/login": {
             "post": {
-                "description": "Logs into an account with the input payload",
                 "consumes": [
                     "application/json"
                 ],
@@ -50,6 +49,37 @@ const docTemplate = `{
                         "description": "Validation error",
                         "schema": {
                             "$ref": "#/definitions/dto.HttpError"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HttpError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HttpError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auths/logout": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logs user out by deleting the session and cookie",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HttpSuccess"
                         }
                     },
                     "401": {
