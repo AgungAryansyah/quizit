@@ -7,8 +7,8 @@ type Register struct {
 }
 
 type LoginReq struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,gte=8"`
+	Email    string `json:"email" validate:"required,email" binding:"required" example:"user@example.com"`
+	Password string `json:"password" validate:"required,gte=8" binding:"required" example:"Strong_Password123"`
 }
 
 type LoginRes struct {

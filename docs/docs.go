@@ -15,6 +15,119 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/auths/login": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logs into an account",
+                "parameters": [
+                    {
+                        "description": "Login request body",
+                        "name": "loginReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.LoginReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HttpSuccess"
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HttpError"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HttpError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HttpError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auths/logout": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logs user out by deleting the session and cookie",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HttpSuccess"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HttpError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HttpError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auths/refresh": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refresh user session",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HttpSuccess"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HttpError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HttpError"
+                        }
+                    }
+                }
+            }
+        },
         "/auths/register": {
             "post": {
                 "description": "Create a new user with the input payload",
@@ -30,7 +143,7 @@ const docTemplate = `{
                 "summary": "Create a new account",
                 "parameters": [
                     {
-                        "description": "Register req body",
+                        "description": "Register request body",
                         "name": "registerReq",
                         "in": "body",
                         "required": true,
@@ -74,11 +187,11 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Article not found"
+                    "example": "Error message"
                 },
                 "messgae": {
                     "type": "string",
-                    "example": "Invalid token"
+                    "example": "Error type"
                 }
             }
         },
@@ -90,6 +203,24 @@ const docTemplate = `{
                     "example": "Succes"
                 },
                 "payload": {}
+            }
+        },
+        "dto.LoginReq": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "user@example.com"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8,
+                    "example": "Strong_Password123"
+                }
             }
         },
         "dto.Register": {

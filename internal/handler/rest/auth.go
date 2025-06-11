@@ -15,7 +15,7 @@ import (
 // @tags Auth
 // @accept json
 // @produce json
-// @param registerReq body dto.Register true "Register req body"
+// @param registerReq body dto.Register true "Register request body"
 // @router /auths/register [post]
 // @success 200 {object} dto.HttpSuccess
 // @failure 400 {object} dto.HttpError "Validation error"
@@ -38,6 +38,16 @@ func (h *Handler) Register(ctx *fiber.Ctx) error {
 	return response.HttpSuccess(ctx, "success", nil)
 }
 
+// @summary Logs into an account
+// @tags Auth
+// @accept json
+// @produce json
+// @param loginReq body dto.LoginReq true "Login request body"
+// @router /auths/login [post]
+// @success 200 {object} dto.HttpSuccess
+// @failure 400 {object} dto.HttpError "Validation error"
+// @failure 401 {object} dto.HttpError "Invalid credentials"
+// @failure 500 {object} dto.HttpError "Internal Server error"
 func (h *Handler) Login(ctx *fiber.Ctx) error {
 	var login dto.LoginReq
 	if err := ctx.BodyParser(&login); err != nil {
@@ -81,6 +91,13 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 	return response.HttpSuccess(ctx, "success", nil)
 }
 
+// @summary Refresh user session
+// @tags Auth
+// @produce json
+// @router /auths/refresh [post]
+// @success 200 {object} dto.HttpSuccess
+// @failure 401 {object} dto.HttpError "Invalid credentials"
+// @failure 500 {object} dto.HttpError "Internal Server error"
 func (h *Handler) RefreshToken(ctx *fiber.Ctx) error {
 	expiry, err := strconv.Atoi(h.env.JWT_EXPIRED)
 	if err != nil {
@@ -115,6 +132,13 @@ func (h *Handler) RefreshToken(ctx *fiber.Ctx) error {
 	return response.HttpSuccess(ctx, "success", nil)
 }
 
+// @summary Logs user out by deleting the session and cookie
+// @tags Auth
+// @produce json
+// @router /auths/logout [post]
+// @success 200 {object} dto.HttpSuccess
+// @failure 401 {object} dto.HttpError "Invalid credentials"
+// @failure 500 {object} dto.HttpError "Internal Server error"
 func (h *Handler) Logout(ctx *fiber.Ctx) error {
 	userId, ok := ctx.Locals("userId").(uuid.UUID)
 	if !ok {
@@ -145,5 +169,3 @@ func (h *Handler) Logout(ctx *fiber.Ctx) error {
 
 	return response.HttpSuccess(ctx, "success", nil)
 }
-
-//todo: add global handler and validator

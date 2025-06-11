@@ -3,10 +3,10 @@ definitions:
   dto.HttpError:
     properties:
       error:
-        example: Article not found
+        example: Error message
         type: string
       messgae:
-        example: Invalid token
+        example: Error type
         type: string
     type: object
   dto.HttpSuccess:
@@ -15,6 +15,19 @@ definitions:
         example: Succes
         type: string
       payload: {}
+    type: object
+  dto.LoginReq:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      password:
+        example: Strong_Password123
+        minLength: 8
+        type: string
+    required:
+    - email
+    - password
     type: object
   dto.Register:
     properties:
@@ -39,13 +52,86 @@ info:
   title: Quizit
   version: "1.0"
 paths:
+  /auths/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Login request body
+        in: body
+        name: loginReq
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Logs into an account
+      tags:
+      - Auth
+  /auths/logout:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Logs user out by deleting the session and cookie
+      tags:
+      - Auth
+  /auths/refresh:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Refresh user session
+      tags:
+      - Auth
   /auths/register:
     post:
       consumes:
       - application/json
       description: Create a new user with the input payload
       parameters:
-      - description: Register req body
+      - description: Register request body
         in: body
         name: registerReq
         required: true
