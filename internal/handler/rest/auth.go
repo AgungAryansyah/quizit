@@ -92,6 +92,13 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 	return response.HttpSuccess(ctx, "success", nil)
 }
 
+// @summary Refresh user session
+// @tags Auth
+// @produce json
+// @router /auths/refresh [post]
+// @success 200 {object} dto.HttpSuccess
+// @failure 401 {object} dto.HttpError "Invalid credentials"
+// @failure 500 {object} dto.HttpError "Internal Server error"
 func (h *Handler) RefreshToken(ctx *fiber.Ctx) error {
 	expiry, err := strconv.Atoi(h.env.JWT_EXPIRED)
 	if err != nil {
@@ -156,5 +163,3 @@ func (h *Handler) Logout(ctx *fiber.Ctx) error {
 
 	return response.HttpSuccess(ctx, "success", nil)
 }
-
-//todo: add global handler and validator

@@ -3,10 +3,10 @@ definitions:
   dto.HttpError:
     properties:
       error:
-        example: Article not found
+        example: Error message
         type: string
       messgae:
-        example: Invalid token
+        example: Error type
         type: string
     type: object
   dto.HttpSuccess:
@@ -84,6 +84,26 @@ paths:
           schema:
             $ref: '#/definitions/dto.HttpError'
       summary: Logs into an account
+      tags:
+      - Auth
+  /auths/refresh:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Refresh user session
       tags:
       - Auth
   /auths/register:

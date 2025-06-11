@@ -67,6 +67,37 @@ const docTemplate = `{
                 }
             }
         },
+        "/auths/refresh": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refresh user session",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HttpSuccess"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HttpError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HttpError"
+                        }
+                    }
+                }
+            }
+        },
         "/auths/register": {
             "post": {
                 "description": "Create a new user with the input payload",
@@ -126,11 +157,11 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Article not found"
+                    "example": "Error message"
                 },
                 "messgae": {
                     "type": "string",
-                    "example": "Invalid token"
+                    "example": "Error type"
                 }
             }
         },
