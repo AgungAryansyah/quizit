@@ -23,7 +23,7 @@ func (h *Handler) GetArticle(ctx *fiber.Ctx) error {
 		return &response.BadRequest
 	}
 
-	article, err := h.service.ArticleServie.GetArticle(articleId)
+	article, err := h.service.ArticleService.GetArticle(articleId)
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func (h *Handler) CreateArticle(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	articleId, err := h.service.ArticleServie.CreateArticle(&create, userId)
+	articleId, err := h.service.ArticleService.CreateArticle(&create, userId)
 	if err != nil {
 		return err
 	}
@@ -80,7 +80,7 @@ func (h *Handler) SearchArticles(ctx *fiber.Ctx) error {
 	pageSize := ctx.QueryInt("size", 9)
 	keyword := ctx.Query("keyword", "")
 
-	articles, err := h.service.ArticleServie.SearchArticles(keyword, page, pageSize)
+	articles, err := h.service.ArticleService.SearchArticles(keyword, page, pageSize)
 	if err != nil {
 		return err
 	}
@@ -106,7 +106,7 @@ func (h *Handler) GetUserArticles(ctx *fiber.Ctx) error {
 	page := ctx.QueryInt("page", 1)
 	pageSize := ctx.QueryInt("size", 9)
 
-	articles, err := h.service.ArticleServie.GetUserArticles(userId, page, pageSize)
+	articles, err := h.service.ArticleService.GetUserArticles(userId, page, pageSize)
 	if err != nil {
 		return err
 	}
@@ -135,7 +135,7 @@ func (h *Handler) DeleteArticle(ctx *fiber.Ctx) error {
 		return &response.BadRequest
 	}
 
-	err = h.service.ArticleServie.DeleteArticle(articleId, userId)
+	err = h.service.ArticleService.DeleteArticle(articleId, userId)
 	if err != nil {
 		return err
 	}
@@ -168,7 +168,7 @@ func (h *Handler) EditArticle(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	err := h.service.ArticleServie.EditArticle(&edit, userId)
+	err := h.service.ArticleService.EditArticle(&edit, userId)
 	if err != nil {
 		return err
 	}
