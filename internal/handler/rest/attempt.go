@@ -8,6 +8,15 @@ import (
 	"github.com/google/uuid"
 )
 
+// @summary User attempts a quiz
+// @tags Attempt
+// @produce json
+// @param answers body dto.UserAnswersDto true "User anser request body"
+// @router /attempts [post]
+// @success 200 {object} dto.HttpSuccess
+// @failure 400 {object} dto.HttpError "Validation error"
+// @failure 404 {object} dto.HttpError "Quiz not found"
+// @failure 500 {object} dto.HttpError "Internal Server error"
 func (h *Handler) CreateAttempt(ctx *fiber.Ctx) error {
 	var answers dto.UserAnswersDto
 	if err := ctx.BodyParser(&answers); err != nil {

@@ -314,6 +314,54 @@ const docTemplate = `{
                 }
             }
         },
+        "/attempts": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Attempt"
+                ],
+                "summary": "User attempts a quiz",
+                "parameters": [
+                    {
+                        "description": "User anser request body",
+                        "name": "answers",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserAnswersDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HttpSuccess"
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HttpError"
+                        }
+                    },
+                    "404": {
+                        "description": "Quiz not found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HttpError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HttpError"
+                        }
+                    }
+                }
+            }
+        },
         "/auths/login": {
             "post": {
                 "consumes": [
@@ -581,6 +629,25 @@ const docTemplate = `{
                 "password": {
                     "type": "string",
                     "example": "Strong_Password123"
+                }
+            }
+        },
+        "dto.UserAnswersDto": {
+            "type": "object",
+            "required": [
+                "answers",
+                "quiz_id"
+            ],
+            "properties": {
+                "answers": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "quiz_id": {
+                    "type": "string",
+                    "example": "11111111-1111-1111-1111-111111111111"
                 }
             }
         }

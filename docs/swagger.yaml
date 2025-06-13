@@ -74,6 +74,19 @@ definitions:
     - name
     - password
     type: object
+  dto.UserAnswersDto:
+    properties:
+      answers:
+        additionalProperties:
+          type: string
+        type: object
+      quiz_id:
+        example: 11111111-1111-1111-1111-111111111111
+        type: string
+    required:
+    - answers
+    - quiz_id
+    type: object
 host: localhost:8081
 info:
   contact: {}
@@ -276,6 +289,37 @@ paths:
       summary: Get an article written by the user
       tags:
       - Article
+  /attempts:
+    post:
+      parameters:
+      - description: User anser request body
+        in: body
+        name: answers
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserAnswersDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "404":
+          description: Quiz not found
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: User attempts a quiz
+      tags:
+      - Attempt
   /auths/login:
     post:
       consumes:
