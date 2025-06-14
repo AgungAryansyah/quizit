@@ -60,8 +60,8 @@ func mountAttempt(routerGroup fiber.Router, handler rest.Handler, middleware mid
 	quiz := routerGroup.Group("/attempts")
 
 	quiz.Post("/", middleware.Authentication, handler.CreateAttempt)
-	quiz.Get("/user", middleware.Authentication, handler.GetUserAttempt)
-	quiz.Get("/quiz/:quizId", middleware.Authentication, handler.GetQuizAttempt)
+	quiz.Get("/users", middleware.Authentication, handler.GetUserAttempt)
+	quiz.Get("/quizzes/:quizId", middleware.Authentication, handler.GetQuizAttempt)
 }
 
 func mountUser(routerGroup fiber.Router, handler rest.Handler, middleware middleware.IMiddleware) {
@@ -73,10 +73,10 @@ func mountUser(routerGroup fiber.Router, handler rest.Handler, middleware middle
 func mountArtice(routerGroup fiber.Router, handler rest.Handler, middleware middleware.IMiddleware) {
 	article := routerGroup.Group("/articles")
 
+	article.Get("/users", middleware.Authentication, handler.GetUserArticles)
 	article.Get("/:id", middleware.Authentication, handler.GetArticle)
 	article.Post("/", middleware.Authentication, handler.CreateArticle)
 	article.Get("/", middleware.Authentication, handler.SearchArticles)
-	article.Get("/users/:userId", middleware.Authentication, handler.GetUserArticles)
 	article.Delete("/:id", middleware.Authentication, handler.DeleteArticle)
 	article.Patch("/", middleware.Authentication, handler.EditArticle)
 }

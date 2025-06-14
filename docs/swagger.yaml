@@ -1,5 +1,78 @@
 basePath: /api/v1
 definitions:
+  dto.CreateArticle:
+    properties:
+      text:
+        example: Article content
+        type: string
+      title:
+        example: Article title
+        type: string
+    required:
+    - text
+    - title
+    type: object
+  dto.CreateOption:
+    properties:
+      is_correct:
+        type: boolean
+      text:
+        type: string
+    required:
+    - text
+    type: object
+  dto.CreateQuestion:
+    properties:
+      options:
+        items:
+          $ref: '#/definitions/dto.CreateOption'
+        maxItems: 5
+        minItems: 2
+        type: array
+      score:
+        maximum: 100
+        minimum: 1
+        type: integer
+      text:
+        type: string
+    required:
+    - options
+    - score
+    - text
+    type: object
+  dto.CreateQuiz:
+    properties:
+      questions:
+        items:
+          $ref: '#/definitions/dto.CreateQuestion'
+        maxItems: 100
+        minItems: 2
+        type: array
+      theme:
+        type: string
+      title:
+        type: string
+    required:
+    - questions
+    - theme
+    - title
+    type: object
+  dto.EditArticle:
+    properties:
+      id:
+        example: 11111111-1111-1111-1111-111111111111
+        type: string
+      text:
+        example: Edited article content
+        type: string
+      title:
+        example: Edited article title
+        type: string
+    required:
+    - id
+    - text
+    - title
+    type: object
   dto.HttpError:
     properties:
       error:
@@ -46,12 +119,339 @@ definitions:
     - name
     - password
     type: object
+  dto.UserAnswersDto:
+    properties:
+      answers:
+        additionalProperties:
+          type: string
+        type: object
+      quiz_id:
+        example: 11111111-1111-1111-1111-111111111111
+        type: string
+    required:
+    - answers
+    - quiz_id
+    type: object
 host: localhost:8081
 info:
   contact: {}
   title: Quizit
   version: "1.0"
 paths:
+  /articles:
+    get:
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: true
+        type: integer
+      - description: Search Keyword
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "404":
+          description: Article not found
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Get an article by search param
+      tags:
+      - Article
+    patch:
+      parameters:
+      - description: Edit article request body
+        in: body
+        name: editArtilce
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EditArticle'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "401":
+          description: Unaouthorized
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "404":
+          description: Article not found
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Edit an article
+      tags:
+      - Article
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Crete article
+        in: body
+        name: createArticle
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateArticle'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "401":
+          description: Unaouthorized
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Create an article
+      tags:
+      - Article
+  /articles/{id}:
+    delete:
+      parameters:
+      - description: Article id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "401":
+          description: Unaouthorized
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "404":
+          description: Article not found
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Delete an article by id
+      tags:
+      - Article
+    get:
+      parameters:
+      - description: Article id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "404":
+          description: Article not found
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Get an article by id
+      tags:
+      - Article
+  /articles/users:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "401":
+          description: Unaouthorized
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "404":
+          description: Article not found
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Get an article written by the user
+      tags:
+      - Article
+  /attempts:
+    post:
+      parameters:
+      - description: User anser request body
+        in: body
+        name: answers
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserAnswersDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "404":
+          description: Quiz not found
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: User attempts a quiz
+      tags:
+      - Attempt
+  /attempts/quizes/{quizId}:
+    get:
+      parameters:
+      - description: Quiz ID
+        in: path
+        name: quizId
+        required: true
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "404":
+          description: Quiz not found
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Get attempts from a quiz
+      tags:
+      - Attempt
+  /attempts/users:
+    get:
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "404":
+          description: Quiz not found
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Get user's attempt
+      tags:
+      - Attempt
   /auths/login:
     post:
       consumes:
@@ -159,4 +559,239 @@ paths:
       summary: Create a new account
       tags:
       - Auth
+  /quizzes:
+    get:
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: true
+        type: integer
+      - description: Search Keyword
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "404":
+          description: Quiz not found
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Search a quiz
+      tags:
+      - Quiz
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Create quiz body request
+        in: body
+        name: createQuiz
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateQuiz'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Create a quiz
+      tags:
+      - Quiz
+  /quizzes/{code}:
+    get:
+      parameters:
+      - description: Quiz code
+        in: path
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "404":
+          description: Quiz not found
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Get quiz by the quiz code
+      tags:
+      - Quiz
+  /quizzes/{quizId}:
+    delete:
+      parameters:
+      - description: Quiz ID
+        in: path
+        name: quizId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "404":
+          description: Quiz not found
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Delete a quiz
+      tags:
+      - Quiz
+  /quizzes/{quizId}/questions/options:
+    get:
+      parameters:
+      - description: Quiz ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "404":
+          description: Quiz not found
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Get quiz with the questions and option
+      tags:
+      - Quiz
+  /quizzes/users:
+    get:
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "404":
+          description: Quiz not found
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Get quiz made by the user
+      tags:
+      - Quiz
+  /users:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Get my account
+      tags:
+      - User
 swagger: "2.0"

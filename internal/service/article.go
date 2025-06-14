@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type IArticleServie interface {
+type IArticleService interface {
 	GetArticle(articleId uuid.UUID) (article *dto.ArticleDto, err error)
 	CreateArticle(create *dto.CreateArticle, userId uuid.UUID) (articleId *uuid.UUID, err error)
 	SearchArticles(keyword string, page, pageSize int) (articles *[]entity.Article, err error)
@@ -17,19 +17,19 @@ type IArticleServie interface {
 	EditArticle(edit *dto.EditArticle, userId uuid.UUID) error
 }
 
-type ArticleServie struct {
+type ArticleService struct {
 	ArticleRepository repository.IArticleRepository
 	UserRepository    repository.IUserRepository
 }
 
-func NewArticleServie(ArticleRepository repository.IArticleRepository, UserRepository repository.IUserRepository) IArticleServie {
-	return &ArticleServie{
+func NewArticleService(ArticleRepository repository.IArticleRepository, UserRepository repository.IUserRepository) IArticleService {
+	return &ArticleService{
 		ArticleRepository: ArticleRepository,
 		UserRepository:    UserRepository,
 	}
 }
 
-func (s *ArticleServie) GetArticle(articleId uuid.UUID) (articleRes *dto.ArticleDto, err error) {
+func (s *ArticleService) GetArticle(articleId uuid.UUID) (articleRes *dto.ArticleDto, err error) {
 	article, err := s.ArticleRepository.GetArticle(articleId)
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (s *ArticleServie) GetArticle(articleId uuid.UUID) (articleRes *dto.Article
 	}, nil
 }
 
-func (s *ArticleServie) CreateArticle(create *dto.CreateArticle, userId uuid.UUID) (articleId *uuid.UUID, err error) {
+func (s *ArticleService) CreateArticle(create *dto.CreateArticle, userId uuid.UUID) (articleId *uuid.UUID, err error) {
 	id := uuid.New()
 	article := &entity.Article{
 		Id:     id,
@@ -64,18 +64,18 @@ func (s *ArticleServie) CreateArticle(create *dto.CreateArticle, userId uuid.UUI
 	return &id, nil
 }
 
-func (s *ArticleServie) SearchArticles(keyword string, page, pageSize int) (articles *[]entity.Article, err error) {
+func (s *ArticleService) SearchArticles(keyword string, page, pageSize int) (articles *[]entity.Article, err error) {
 	return s.ArticleRepository.SearchArticles(keyword, page, pageSize)
 }
 
-func (s *ArticleServie) GetUserArticles(userId uuid.UUID, page, pageSize int) (articles *[]entity.Article, err error) {
+func (s *ArticleService) GetUserArticles(userId uuid.UUID, page, pageSize int) (articles *[]entity.Article, err error) {
 	return s.ArticleRepository.GetUserArticles(userId, page, pageSize)
 }
 
-func (s *ArticleServie) DeleteArticle(articleId uuid.UUID, userId uuid.UUID) error {
+func (s *ArticleService) DeleteArticle(articleId uuid.UUID, userId uuid.UUID) error {
 	return s.ArticleRepository.DeleteArticle(articleId, userId)
 }
 
-func (s *ArticleServie) EditArticle(edit *dto.EditArticle, userId uuid.UUID) error {
+func (s *ArticleService) EditArticle(edit *dto.EditArticle, userId uuid.UUID) error {
 	return s.ArticleRepository.EditArticle(edit, userId)
 }

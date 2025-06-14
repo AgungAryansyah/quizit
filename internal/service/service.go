@@ -10,7 +10,7 @@ type Service struct {
 	UserService    IUserService
 	QuizService    IQuizService
 	AttemptService IAttemptService
-	ArticleServie  IArticleServie
+	ArticleService IArticleService
 }
 
 func NewService(repository *repository.Repository, jwt *jwt.IJWT) *Service {
@@ -19,6 +19,6 @@ func NewService(repository *repository.Repository, jwt *jwt.IJWT) *Service {
 		UserService:    NewUserService(repository.UserRepository),
 		QuizService:    NewQuizService(repository.QuizRepository, repository.UserRepository),
 		AttemptService: NewAttemptService(repository.AttemptRepository, repository.QuizRepository),
-		ArticleServie:  NewArticleServie(repository.ArticleRepository, repository.UserRepository),
+		ArticleService: NewArticleService(repository.ArticleRepository, repository.UserRepository),
 	}
 }
