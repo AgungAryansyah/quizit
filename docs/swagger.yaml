@@ -309,6 +309,10 @@ paths:
           description: Validation error
           schema:
             $ref: '#/definitions/dto.HttpError'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.HttpError'
         "404":
           description: Quiz not found
           schema:
@@ -318,6 +322,68 @@ paths:
           schema:
             $ref: '#/definitions/dto.HttpError'
       summary: User attempts a quiz
+      tags:
+      - Attempt
+  /attempts/quizes:
+    get:
+      parameters:
+      - description: Quiz ID
+        in: path
+        name: quizId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "404":
+          description: Quiz not found
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Get attempts from a quiz
+      tags:
+      - Attempt
+  /attempts/users:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "404":
+          description: Quiz not found
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Get user's attempt
       tags:
       - Attempt
   /auths/login:
