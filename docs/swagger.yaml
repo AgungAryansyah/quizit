@@ -770,4 +770,28 @@ paths:
       summary: Get quiz made by the user
       tags:
       - Quiz
+  /users:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HttpSuccess'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+        "500":
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/dto.HttpError'
+      summary: Get my account
+      tags:
+      - User
 swagger: "2.0"
