@@ -41,6 +41,8 @@ func (h *Handler) CreateAttempt(ctx *fiber.Ctx) error {
 // @tags Attempt
 // @produce json
 // @router /attempts/users [get]
+// @param page query int true "Page number"
+// @param size query int true "Page size"
 // @success 200 {object} dto.HttpSuccess
 // @failure 400 {object} dto.HttpError "Validation error"
 // @failure 401 {object} dto.HttpError "Invalid credentials"
@@ -66,7 +68,9 @@ func (h *Handler) GetUserAttempt(ctx *fiber.Ctx) error {
 // @summary Get attempts from a quiz
 // @tags Attempt
 // @produce json
-// @param quizId path string true "Quiz ID"
+// @param quizId path  string true "Quiz ID"
+// @param page   query int    true "Page number"
+// @param size   query int    true "Page size"
 // @router /attempts/quizes [get]
 // @success 200 {object} dto.HttpSuccess
 // @failure 400 {object} dto.HttpError "Validation error"
