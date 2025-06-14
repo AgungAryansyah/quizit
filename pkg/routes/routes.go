@@ -60,8 +60,8 @@ func mountAttempt(routerGroup fiber.Router, handler rest.Handler, middleware mid
 	quiz := routerGroup.Group("/attempts")
 
 	quiz.Post("/", middleware.Authentication, handler.CreateAttempt)
-	quiz.Get("/user", middleware.Authentication, handler.GetUserAttempt)
-	quiz.Get("/quiz/:quizId", middleware.Authentication, handler.GetQuizAttempt)
+	quiz.Get("/users", middleware.Authentication, handler.GetUserAttempt)
+	quiz.Get("/quizzes/:quizId", middleware.Authentication, handler.GetQuizAttempt)
 }
 
 func mountUser(routerGroup fiber.Router, handler rest.Handler, middleware middleware.IMiddleware) {
