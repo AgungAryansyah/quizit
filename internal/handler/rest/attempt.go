@@ -71,7 +71,7 @@ func (h *Handler) GetUserAttempt(ctx *fiber.Ctx) error {
 // @param quizId path  string true "Quiz ID"
 // @param page   query int    true "Page number"
 // @param size   query int    true "Page size"
-// @router /attempts/quizes [get]
+// @router /attempts/quizes/{quizId} [get]
 // @success 200 {object} dto.HttpSuccess
 // @failure 400 {object} dto.HttpError "Validation error"
 // @failure 401 {object} dto.HttpError "Invalid credentials"

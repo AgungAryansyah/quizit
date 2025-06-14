@@ -35,7 +35,7 @@ func (h *Handler) GetArticle(ctx *fiber.Ctx) error {
 // @tags Article
 // @accept json
 // @produce json
-// @param id body dto.CreateArticle true "Crete article"
+// @param createArticle body dto.CreateArticle true "Crete article"
 // @router /articles [post]
 // @success 200 {object} dto.HttpSuccess
 // @failure 400 {object} dto.HttpError "Validation error"
