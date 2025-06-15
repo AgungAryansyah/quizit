@@ -1,6 +1,6 @@
 package dto
 
-type Register struct {
+type RegisterReq struct {
 	Name     string `json:"name" validate:"required,min=6" binding:"required" example:"new user"`
 	Email    string `json:"email" validate:"required,email" binding:"required" example:"user@example.com"`
 	Password string `json:"password" validate:"required,password" binding:"required" example:"Strong_Password123"`

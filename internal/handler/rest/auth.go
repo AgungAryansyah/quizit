@@ -15,14 +15,14 @@ import (
 // @tags Auth
 // @accept json
 // @produce json
-// @param registerReq body dto.Register true "Register request body"
+// @param registerReq body dto.RegisterReq true "Register request body"
 // @router /auths/register [post]
 // @success 200 {object} dto.HttpSuccess
 // @failure 400 {object} dto.HttpError "Validation error"
 // @failure 409 {object} dto.HttpError "User already exist"
 // @failure 500 {object} dto.HttpError "Internal Server error"
 func (h *Handler) Register(ctx *fiber.Ctx) error {
-	var register dto.Register
+	var register dto.RegisterReq
 	if err := ctx.BodyParser(&register); err != nil {
 		return err
 	}

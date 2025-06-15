@@ -619,7 +619,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.Register"
+                            "$ref": "#/definitions/dto.RegisterReq"
                         }
                     }
                 ],
@@ -1156,7 +1156,7 @@
                 }
             }
         },
-        "dto.Register": {
+        "dto.RegisterReq": {
             "type": "object",
             "required": [
                 "email",

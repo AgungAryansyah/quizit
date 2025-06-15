@@ -14,7 +14,7 @@ import (
 )
 
 type IAuthService interface {
-	Register(register *dto.Register) error
+	Register(register *dto.RegisterReq) error
 	Login(login *dto.LoginReq, expiry int) (res *dto.LoginRes, err error)
 	ReplaceToken(token string, expiry int) (res *dto.LoginRes, err error)
 	Logout(userId uuid.UUID) error
@@ -34,7 +34,7 @@ func NewAuthService(UserRepository repository.IUserRepository, AuthRepository re
 	}
 }
 
-func (s *AuthService) Register(register *dto.Register) error {
+func (s *AuthService) Register(register *dto.RegisterReq) error {
 	hasedPassword, err := bcrypt.GenerateFromPassword([]byte(register.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err

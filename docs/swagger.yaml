@@ -102,7 +102,7 @@ definitions:
     - email
     - password
     type: object
-  dto.Register:
+  dto.RegisterReq:
     properties:
       email:
         example: user@example.com
@@ -536,7 +536,7 @@ paths:
         name: registerReq
         required: true
         schema:
-          $ref: '#/definitions/dto.Register'
+          $ref: '#/definitions/dto.RegisterReq'
       produces:
       - application/json
       responses:
