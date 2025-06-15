@@ -7,7 +7,7 @@ type UserAnswersDto struct {
 	Answers map[uuid.UUID]uuid.UUID `json:"answers" validate:"required,answers_map" binding:"required"`
 }
 
-type CreateAttempt struct {
+type CreateAttemptReq struct {
 	UserId     uuid.UUID `json:"user_id" validate:"required,uuid"`
 	QuizId     uuid.UUID `json:"quiz_id" validate:"required,uuid"`
 	TotalScore int       `json:"total_score" validate:"required,min=1"`

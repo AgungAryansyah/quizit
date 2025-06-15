@@ -91,7 +91,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.CreateArticle"
+                            "$ref": "#/definitions/dto.CreateArticleReq"
                         }
                     }
                 ],
@@ -137,7 +137,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.EditArticle"
+                            "$ref": "#/definitions/dto.EditArticleReq"
                         }
                     }
                 ],
@@ -1019,7 +1019,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dto.CreateArticle": {
+        "dto.CreateArticleReq": {
             "type": "object",
             "required": [
                 "text",
@@ -1100,7 +1100,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.EditArticle": {
+        "dto.EditArticleReq": {
             "type": "object",
             "required": [
                 "id",

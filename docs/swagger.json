@@ -84,7 +84,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.CreateArticle"
+                            "$ref": "#/definitions/dto.CreateArticleReq"
                         }
                     }
                 ],
@@ -130,7 +130,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.EditArticle"
+                            "$ref": "#/definitions/dto.EditArticleReq"
                         }
                     }
                 ],
@@ -1012,7 +1012,7 @@
         }
     },
     "definitions": {
-        "dto.CreateArticle": {
+        "dto.CreateArticleReq": {
             "type": "object",
             "required": [
                 "text",
@@ -1093,7 +1093,7 @@
                 }
             }
         },
-        "dto.EditArticle": {
+        "dto.EditArticleReq": {
             "type": "object",
             "required": [
                 "id",
