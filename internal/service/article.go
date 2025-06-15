@@ -10,11 +10,11 @@ import (
 
 type IArticleService interface {
 	GetArticle(articleId uuid.UUID) (article *dto.ArticleDto, err error)
-	CreateArticle(create *dto.CreateArticle, userId uuid.UUID) (articleId *uuid.UUID, err error)
+	CreateArticle(create *dto.CreateArticleReq, userId uuid.UUID) (articleId *uuid.UUID, err error)
 	SearchArticles(keyword string, page, pageSize int) (articles *[]entity.Article, err error)
 	GetUserArticles(userId uuid.UUID, page, pageSize int) (articles *[]entity.Article, err error)
 	DeleteArticle(articleId uuid.UUID, userId uuid.UUID) error
-	EditArticle(edit *dto.EditArticle, userId uuid.UUID) error
+	EditArticle(edit *dto.EditArticleReq, userId uuid.UUID) error
 }
 
 type ArticleService struct {
@@ -47,7 +47,7 @@ func (s *ArticleService) GetArticle(articleId uuid.UUID) (articleRes *dto.Articl
 	}, nil
 }
 
-func (s *ArticleService) CreateArticle(create *dto.CreateArticle, userId uuid.UUID) (articleId *uuid.UUID, err error) {
+func (s *ArticleService) CreateArticle(create *dto.CreateArticleReq, userId uuid.UUID) (articleId *uuid.UUID, err error) {
 	id := uuid.New()
 	article := &entity.Article{
 		Id:     id,
@@ -76,6 +76,6 @@ func (s *ArticleService) DeleteArticle(articleId uuid.UUID, userId uuid.UUID) er
 	return s.ArticleRepository.DeleteArticle(articleId, userId)
 }
 
-func (s *ArticleService) EditArticle(edit *dto.EditArticle, userId uuid.UUID) error {
+func (s *ArticleService) EditArticle(edit *dto.EditArticleReq, userId uuid.UUID) error {
 	return s.ArticleRepository.EditArticle(edit, userId)
 }

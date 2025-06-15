@@ -1,6 +1,6 @@
 basePath: /api/v1
 definitions:
-  dto.CreateArticle:
+  dto.CreateArticleReq:
     properties:
       text:
         example: Article content
@@ -57,7 +57,7 @@ definitions:
     - theme
     - title
     type: object
-  dto.EditArticle:
+  dto.EditArticleReq:
     properties:
       id:
         example: 11111111-1111-1111-1111-111111111111
@@ -102,7 +102,7 @@ definitions:
     - email
     - password
     type: object
-  dto.Register:
+  dto.RegisterReq:
     properties:
       email:
         example: user@example.com
@@ -184,7 +184,7 @@ paths:
         name: editArtilce
         required: true
         schema:
-          $ref: '#/definitions/dto.EditArticle'
+          $ref: '#/definitions/dto.EditArticleReq'
       produces:
       - application/json
       responses:
@@ -220,7 +220,7 @@ paths:
         name: createArticle
         required: true
         schema:
-          $ref: '#/definitions/dto.CreateArticle'
+          $ref: '#/definitions/dto.CreateArticleReq'
       produces:
       - application/json
       responses:
@@ -536,7 +536,7 @@ paths:
         name: registerReq
         required: true
         schema:
-          $ref: '#/definitions/dto.Register'
+          $ref: '#/definitions/dto.RegisterReq'
       produces:
       - application/json
       responses:

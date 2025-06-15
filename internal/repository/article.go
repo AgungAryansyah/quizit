@@ -17,7 +17,7 @@ type IArticleRepository interface {
 	SearchArticles(keyword string, page, pageSize int) (articles *[]entity.Article, err error)
 	GetUserArticles(userId uuid.UUID, page, pageSize int) (articles *[]entity.Article, err error)
 	DeleteArticle(articleId uuid.UUID, userId uuid.UUID) error
-	EditArticle(edit *dto.EditArticle, userId uuid.UUID) error
+	EditArticle(edit *dto.EditArticleReq, userId uuid.UUID) error
 }
 
 type ArticleRepository struct {
@@ -120,7 +120,7 @@ func (r *ArticleRepository) DeleteArticle(articleId uuid.UUID, userId uuid.UUID)
 	return nil
 }
 
-func (r *ArticleRepository) EditArticle(edit *dto.EditArticle, userId uuid.UUID) error {
+func (r *ArticleRepository) EditArticle(edit *dto.EditArticleReq, userId uuid.UUID) error {
 	query := `UPDATE articles SET title = $1, text = $2 WHERE id = $3 AND user_id = $4`
 	_, err := r.db.Exec(query, edit.Title, edit.Text, edit.Id, userId)
 	if err != nil {

@@ -35,14 +35,14 @@ func (h *Handler) GetArticle(ctx *fiber.Ctx) error {
 // @tags Article
 // @accept json
 // @produce json
-// @param createArticle body dto.CreateArticle true "Crete article"
+// @param createArticle body dto.CreateArticleReq true "Crete article"
 // @router /articles [post]
 // @success 200 {object} dto.HttpSuccess
 // @failure 400 {object} dto.HttpError "Validation error"
 // @failure 401 {object} dto.HttpError "Unaouthorized"
 // @failure 500 {object} dto.HttpError "Internal Server error"
 func (h *Handler) CreateArticle(ctx *fiber.Ctx) error {
-	var create dto.CreateArticle
+	var create dto.CreateArticleReq
 	if err := ctx.BodyParser(&create); err != nil {
 		return &response.Unauthorized
 	}
@@ -146,7 +146,7 @@ func (h *Handler) DeleteArticle(ctx *fiber.Ctx) error {
 // @summary Edit an article
 // @tags Article
 // @produce json
-// @param editArtilce body dto.EditArticle true "Edit article request body"
+// @param editArtilce body dto.EditArticleReq true "Edit article request body"
 // @router /articles [patch]
 // @success 200 {object} dto.HttpSuccess
 // @failure 400 {object} dto.HttpError "Validation error"
@@ -159,7 +159,7 @@ func (h *Handler) EditArticle(ctx *fiber.Ctx) error {
 		return &response.Unauthorized
 	}
 
-	var edit dto.EditArticle
+	var edit dto.EditArticleReq
 	if err := ctx.BodyParser(&edit); err != nil {
 		return &response.Unauthorized
 	}
