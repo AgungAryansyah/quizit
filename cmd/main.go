@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	_ "quizit-be/docs"
 	"quizit-be/internal/handler/rest"
 	"quizit-be/internal/repository"
@@ -19,28 +20,28 @@ import (
 // @host localhost:8081
 // @basePath /api/v1
 func main() {
-	env, err := env.Load()
+	err := env.Load()
 	if err != nil {
 		panic(err)
 	}
 
 	app := fiber.Start()
 
-	db, err := postgres.Connect(*env)
+	db, err := postgres.Connect()
 	if err != nil {
 		panic(err)
 	}
 
-	jwt := jwt.NewJwt(*env)
+	jwt := jwt.NewJwt()
 	middleware := middleware.NewMiddleware(jwt)
 	validator := validator.NewValidator()
 
 	repository := repository.NewRepository(db)
 	service := service.NewService(repository, &jwt)
-	handler := rest.NewHandler(service, middleware, env, validator)
+	handler := rest.NewHandler(service, middleware, validator)
 
 	route := routes.NewRoute(app, *handler, middleware)
-	if err := route.RegisterRoutes(env.APP_PORT); err != nil {
+	if err := route.RegisterRoutes(os.Getenv("APP_PORT")); err != nil {
 		panic(err)
 	}
 }

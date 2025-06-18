@@ -2,7 +2,7 @@ package jwt
 
 import (
 	"errors"
-	"quizit-be/pkg/env"
+	"os"
 	"quizit-be/pkg/response"
 	"strconv"
 	"time"
@@ -22,16 +22,16 @@ type JWT struct {
 	expiresAt time.Time
 }
 
-func NewJwt(env env.Env) IJWT {
+func NewJwt() IJWT {
 	err := godotenv.Load()
 	if err != nil {
 		return nil
 	}
-	exp, err := strconv.Atoi(env.JWT_EXPIRED)
+	exp, err := strconv.Atoi(os.Getenv("JWT_EXPIRED"))
 	if err != nil {
 		return nil
 	}
-	secret := env.JWT_SECRET
+	secret := os.Getenv("JWT_SECRET")
 	return &JWT{
 		secretKey: secret,
 		expiresAt: time.Now().Add(time.Duration(exp) * time.Hour),
