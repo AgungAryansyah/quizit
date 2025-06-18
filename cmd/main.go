@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	_ "quizit-be/docs"
 	"quizit-be/internal/handler/rest"
@@ -22,14 +23,12 @@ import (
 func main() {
 	err := env.Load()
 	if err != nil {
-		panic(err)
+		log.Fatal(err.Error())
 	}
-
-	app := fiber.Start()
 
 	db, err := postgres.Connect()
 	if err != nil {
-		panic(err)
+		log.Fatal(err.Error())
 	}
 
 	jwt := jwt.NewJwt()
@@ -40,8 +39,10 @@ func main() {
 	service := service.NewService(repository, &jwt)
 	handler := rest.NewHandler(service, middleware, validator)
 
+	app := fiber.Start()
 	route := routes.NewRoute(app, *handler, middleware)
-	if err := route.RegisterRoutes(os.Getenv("APP_PORT")); err != nil {
-		panic(err)
+	err = route.RegisterRoutes(os.Getenv("APP_PORT"))
+	if err != nil {
+		log.Fatal(err.Error())
 	}
 }
