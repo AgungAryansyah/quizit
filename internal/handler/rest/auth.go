@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"os"
 	"quizit-be/model/dto"
 	"quizit-be/pkg/response"
 	"strconv"
@@ -58,7 +59,7 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	expiry, err := strconv.Atoi(h.env.JWT_EXPIRED)
+	expiry, err := strconv.Atoi(os.Getenv("JWT_EXPIRED"))
 	if err != nil {
 		return err
 	}
@@ -99,7 +100,7 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 // @failure 401 {object} dto.HttpError "Invalid credentials"
 // @failure 500 {object} dto.HttpError "Internal Server error"
 func (h *Handler) RefreshToken(ctx *fiber.Ctx) error {
-	expiry, err := strconv.Atoi(h.env.JWT_EXPIRED)
+	expiry, err := strconv.Atoi(os.Getenv("JWT_EXPIRED"))
 	if err != nil {
 		return err
 	}
